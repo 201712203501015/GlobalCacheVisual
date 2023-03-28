@@ -102,7 +102,10 @@ export default {
       }
     }).catch(err => {
       // 输出错误信息
-      console.log(err.message)
+      // console.log(err.message)
+      ElMessageBox.alert('请求失败', '警告', {
+        confirmButtonText: 'OK'
+      })
     })
   },
   methods: {
@@ -173,16 +176,15 @@ export default {
           }
         }).then((res) => {
           let recvdata = res.data.data
-          this.loading = false
           if(recvdata.isSuccessed === false){ // 发送失败
             // alert('发送失败，请重新发送')
             ElMessage.error('发送失败，请重新发送')
             return ;
           }
+          // 结束变为false
+          this.loading = false
           this.nextStep(ret);
         })
-        // 结束变为false
-        this.loading = false
       }else{ // 后退一步
         this.nextStep(ret);
       }

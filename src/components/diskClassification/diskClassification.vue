@@ -203,7 +203,10 @@ export default {
       }
     }).catch(err => {
       // 输出错误信息
-      console.log(err.message)
+      // console.log(err.message)
+      ElMessageBox.alert('请求失败', '警告', {
+        confirmButtonText: 'OK'
+      })
     })
   },
   methods: {
@@ -255,10 +258,13 @@ export default {
         this.nextStep(ret)
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
+        // 结束变为false
+        this.loading = false
       })
-      // 结束变为false
-      this.loading = false
     },
     // 返回数据，根据磁盘名称，返回磁盘列表
     getDataList(arr,brr){

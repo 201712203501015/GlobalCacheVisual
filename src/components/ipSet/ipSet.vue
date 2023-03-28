@@ -128,22 +128,33 @@ export default {
       // console.log("====================-----------------------------",this.ipList)
     }).catch(err => {
       // 输出错误信息
-      console.log(err.message)
+      // console.log(err.message)
+      ElMessageBox.alert('请求失败', '警告', {
+        confirmButtonText: 'OK'
+      })
     })
   },
   methods: {
-    // 确保每个ip修改完毕
     beforeNextStep(ret) {
       let fg = true
+      // 1 确保每个ip修改完毕
+      // 2 确保每个IP的 localIPv4、clusterIPv4都不一样
+      const localIPv4 = new Set()
+      const clusterIPv4 = new Set()
       for(let i=0;i<this.ipList.length;i++) {
         if(this.ipList[i].localIPv4State === 1 || this.ipList[i].clusterIPv4State === 1) {
           fg = false
         }
+        if(clusterIPv4.has(this.ipList[i].clusterIPv4) === true || localIPv4.has(this.ipList[i].localIPv4) === true){
+          fg = false
+        }
+        localIPv4.add(this.ipList[i].localIPv4)
+        clusterIPv4.add(this.ipList[i].clusterIPv4)
       }
       if(fg === false){
         // alert('请确保每个ip都set了')
         ElMessage({
-          message: '请确保每个ip都set了',
+          message: '请确保每个ip都set了，并且clusterIPv4和localIPv4都不一样',
           type: 'warning',
         })
         return ;
@@ -178,10 +189,13 @@ export default {
         this.nextStep(ret)
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
+        // 结束变为false
+        this.loading = false
       })
-      // 结束变为false
-      this.loading = false
     },
     // 下一步
     nextStep(ret) {

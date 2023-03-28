@@ -262,7 +262,7 @@
 <script>
 import { useStore } from "vuex";
 import API from '@/api/ajax.js'; // 引入API
-import { ElMessage } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 export default {
   setup() {
     // 创建store对象
@@ -433,7 +433,10 @@ export default {
         this.loading = false
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
         // 5 不转圈圈
         this.loading = false
       })

@@ -24,7 +24,8 @@
                     <div class="dot-text">
                         {{ props.row[item.key].nodeId }}
                         <br />
-                        {{ this.nodeList.nodeValue[ props.row[item.key].nodeIdNum ] * 100.0 }}%
+                        <!-- 3-27 不乘以100 -->
+                        {{ this.nodeList.nodeValue[ props.row[item.key].nodeIdNum ] }}%
                     </div>
                 </div>
                     
@@ -48,7 +49,8 @@
   <script>
   import { useStore } from 'vuex'
   import { defineAsyncComponent } from "vue"
-  import { WEBSOCKET_PORT } from '@/api/port.js'
+  import { IP,WEBSOCKET_PORT } from '@/api/port.js'
+  import { ElMessageBox } from 'element-plus'
   export default {
     setup () {
       // 创建store对象
@@ -297,7 +299,7 @@
   
       // wsNodeList 初始化
       initNodeList () {
-          this.wsNodeList = new WebSocket('ws://localhost:'+WEBSOCKET_PORT)
+          this.wsNodeList = new WebSocket("ws://"+IP+WEBSOCKET_PORT);
           this.wsNodeList.onopen = this.websocketonopen
           this.wsNodeList.onerror = this.websocketonerror
           this.wsNodeList.onmessage = this.websocketonmessage
@@ -315,6 +317,9 @@
       },
       websocketonerror() { // 连接失败
         //   console.log("NodeList WebSocket连接失败")
+        ElMessageBox.alert('连接失败', '警告', {
+          confirmButtonText: 'OK'
+        })
       },
       websocketonmessage(ret) { // 数据接收
           // 接收到的类似send的数据，其中sendData.data 是要接受的数据

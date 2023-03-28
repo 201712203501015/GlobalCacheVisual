@@ -32,6 +32,7 @@ export default createStore({
       // 自动化部署部分
       activeStep: 0, // 当前是第几步
       isFinished: false ,// 是否完成自动化部署了
+      isHasPassword: true, // 是否输入过了root密码：true表示未输入，false表示已输入
     }
   },
   // 从 store 中的 state 中派生出一些状态：比如将A = {a:1,b:2}，我们要将A.a传给组件1，将A.b传给组件2
@@ -110,6 +111,10 @@ export default createStore({
     // isFinished
     changeIsFinished (state, nowVal) {
       state.isFinished = nowVal
+    },
+    // isHasPassword
+    changeIsHasPassword (state, nowVal) {
+      state.isHasPassword = nowVal
     }
   },
   // Action 提交的是 mutation，而不是直接变更状态，相当于异步mutation，当

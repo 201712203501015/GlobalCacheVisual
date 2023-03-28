@@ -24,7 +24,7 @@
           <span class="autoDel" :class="{'un-autoDel':this.isFinished === false}">{{ messTip() }}</span>
           &nbsp;&nbsp;
           <!-- 超级管理员，可以采用自动化部署 -->
-          <el-button type="primary" v-if="isSuperUser === true" @click="goto('autoDepl')" size="small" round>自动化部署</el-button>
+          <el-button :disabled="this.isFinished" type="primary" v-if="isSuperUser === true" @click="goto('autoDepl')" size="small" round>自动化部署</el-button>
         </el-form-item>
         <el-form-item label="修改密码" class="form-box">
           <div>
@@ -61,7 +61,7 @@
 <script>
 import { useStore } from "vuex";
 import API from '@/api/ajax.js'; // 引入API
-import { ElMessage } from 'element-plus'
+import { ElMessage,ElMessageBox } from 'element-plus'
 export default {
   setup() {
     // 创建store对象
@@ -120,7 +120,10 @@ export default {
         this.newPassword = null
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
       })
     },
     messTip() {
@@ -152,7 +155,10 @@ export default {
         this.$router.push(`/loginView?redirect=${this.$route.fullPath}`).catch(err=>err)
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
       })
     }
   },

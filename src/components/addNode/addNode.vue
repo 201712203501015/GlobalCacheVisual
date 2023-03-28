@@ -19,7 +19,7 @@
               &nbsp;
             </td>
             <td>
-              <el-button v-loading="loading" type="primary" @click="onSubmit">Submit</el-button>
+              <el-button v-loading="loadingSubmit" type="primary" @click="onSubmit">Submit</el-button>
             </td>
           </tr>
         </table>
@@ -43,7 +43,7 @@
               <el-input :disabled="isReady" v-model="ipNum4" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
             </td>
             <td>
-              <el-button :disabled="isReady" v-loading="loading" @click="addIP" type="primary">添加节点IP</el-button>
+              <el-button :disabled="isReady||loadingAddIP" v-loading="loadingAddIP" @click="addIP" type="primary">添加节点IP</el-button>
             </td>
           </tr>
         </table>
@@ -70,7 +70,7 @@
               <!-- 节点列表 -->
               <el-table
                 :header-cell-style="{height: '50px', color: 'black'}" 
-                v-loading="loading" v-if="ipList.length > 0" :data="ipList" height="500px"
+                v-loading="loadingTable" v-if="ipList.length > 0" :data="ipList" height="500px"
               >
                 
                 <!-- 名称列 -->
@@ -104,17 +104,9 @@
                     <el-button
                       size="small"
                       type="danger"
-                      v-loading="loading"
+                      v-loading="loadingDelet"
                       @click="handleDelete(scope.$index)"
                       >删除节点</el-button
-                    >
-                    <!-- &nbsp; -->
-                    <!-- 删除按钮 -->
-                    <el-button
-                      v-loading="loading"
-                      size="small"
-                      @click="handleUpdate(scope.$index)"
-                      >更新节点</el-button
                     >
                   </template>
                 </el-table-column>
@@ -133,7 +125,7 @@
 </template>
 
 <script>
-import { ElMessage } from 'element-plus'
+import { ElMessageBox,ElMessage } from 'element-plus'
 import { useStore } from 'vuex'
 import API from '@/api/ajax.js'; // 引入API
 export default {
@@ -147,7 +139,6 @@ export default {
   data() {
     return {
       // 是否可以输入
-      isReady: true,
       // password
       password: null,
       // 输入的ip
@@ -157,7 +148,10 @@ export default {
       ipNum4:0,
       // ip列表
       ipList: [],
-      loading: false,
+      loadingSubmit: false,
+      loadingDelet: false,
+      loadingAddIP: false,
+      loadingTable: false,
     }
   },
   // created() {
@@ -170,6 +164,7 @@ export default {
     // 如果已经输入root密码
     if(this.isReady === false) {
       // 3 向后台请求ip列表
+      // console.log('=====111====')
       this.getIPList()
     }
   },
@@ -206,7 +201,7 @@ export default {
         return;
       }
       // 请求，新增节点
-      // this.loading = true
+      this.loadingAddIP = true
       API({
         url: '/getAddIP',
         method: 'post',
@@ -215,7 +210,6 @@ export default {
           token: this.store.state.userToken
         }
       }).then((res) => {
-        // this.loading = false
         let recvdata = res.data.data
         if(recvdata.isValid === true) {
           // 新增IPnode
@@ -230,17 +224,21 @@ export default {
           // alert('新增失败，'+recvdata.reason)
           ElMessage.error(ss + '新增失败，请检查root密码或者节点ip是否合法')
         }
+        this.loadingAddIP = false
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
+        this.loadingAddIP = false
       })
-      
     },
     // 删除IP节点
     handleDelete(index) {
       // console.log('index = ',index, 'ret = ',ret)
       if(this.ipList.length > 0 && index < this.ipList.length) {
-        this.loading = true
+        this.loadingDelet = true
         API({
           url: '/getDeleteIP',
           method: 'post',
@@ -249,7 +247,6 @@ export default {
             token: this.store.state.userToken
           }
         }).then((res) => {
-          this.loading = false
           let recvdata = res.data.data
           if(recvdata.isValid === true) {
             // 在列表中删除ip节点
@@ -258,16 +255,20 @@ export default {
             // alert('IP: ' + this.ipList[index].name + '无法被删除')
             ElMessage.error('IP: ' + this.ipList[index].name + '无法被删除')
           }
+          this.loadingDelet = false
         }).catch(err => {
           // 输出错误信息
-          console.log(err.message)
+          // console.log(err.message)
+          ElMessageBox.alert('请求失败', '警告', {
+            confirmButtonText: 'OK'
+          })
+          this.loadingDelet = false
         })
-        // 结束变为false
-        this.loading = false
       }
     },
     // 请求IP列表
     getIPList (){
+      this.loadingTable = true
       API({
         url: '/getIpList',
         method: 'post',
@@ -277,15 +278,20 @@ export default {
       }).then((res) => {
         let recvdata = res.data.data
         this.ipList = recvdata.ipList // 更新ipList数组
+        this.loadingTable = false
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
+        this.loadingTable = false
       })
     },
     // 像后端传递root密码
     onSubmit() {
       // 向后台请求，判断root密码是否正确，如果正确，放行；否则，重新输入；
-      this.loading = true
+      this.loadingSubmit = true
       API({
         url:'/getCheckRootPassword',
         method: 'post',
@@ -295,30 +301,32 @@ export default {
         }
       }).then((res) => { // 请求成功后的操作，可以跳转
         // console.log('请求成功,res = ',res)
-        this.loading = false
         let recvdata = res.data.data
         if(recvdata.isRight === true) {
           // 1 弹窗
           ElMessage({
             type: 'success',
-            message: 'root密码输入正确',
+            message: 'root密码提交成功',
           })
-          // 2 切换状态
-          this.isReady = false
+          // 2 切换状态，改为已经输入root密码状态
+          this.store.commit('changeIsHasPassword', false)
           // 3 向后台请求ip列表
           this.getIPList()
         }else{
           ElMessage({
             type: 'error',
-            message: 'root密码输入错误，请重新输入',
+            message: 'root密码提交失败，请重新输入',
           })
         }
+        this.loadingSubmit = false
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
+        this.loadingSubmit = false
       })
-      // 结束变为false
-      this.loading = false
     },
     beforeNextStep (ret) {
       // 1 判断是否有4个IP
@@ -348,33 +356,6 @@ export default {
         })
       }
     },
-    // 检测更新IP节点
-    handleUpdate(index) {
-      // console.log('index = ',index, 'ret = ',ret)
-      if(this.ipList.length > 0 && index < this.ipList.length) {
-        this.loading = true
-        API({
-          url: '/getHardwareDetect',
-          method: 'post',
-          data: {
-            ipAddress: this.ipList[index].name,
-            token: this.store.state.userToken
-          }
-        }).then((res) => {
-          this.loading = false
-          let recvdata = res.data.data
-          // 更新这个节点的信息
-          this.ipList[index].isConnected = recvdata.isConnected
-          this.ipList[index].isCpu = recvdata.isCpu
-          this.ipList[index].isMemory = recvdata.isMemory
-        }).catch(err => {
-          // 输出错误信息
-          console.log(err.message)
-        })
-        // 结束变为false
-        this.loading = false
-      }
-    },
   },
   computed: {
     validIP() {
@@ -385,6 +366,10 @@ export default {
         }
       }
       return ans;
+    },
+    // 返回当前是否知道密码
+    isReady() {
+      return this.store.state.isHasPassword
     }
   }
 }

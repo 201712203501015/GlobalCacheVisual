@@ -61,7 +61,7 @@
               >视图</el-menu-item
             >
             <!-- 自动化部署 -->
-            <el-menu-item v-if="isRoot" index="3" @click="goto('autoDepl')"
+            <el-menu-item v-if="isRoot" index="3" @click="goto('autoDepl')" :disabled="this.store.state.isFinished"
               >自动化部署</el-menu-item
             >
             <!-- <el-menu-item index="3" @click="goto('manageView')"
@@ -198,7 +198,10 @@ export default {
         }
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
       })
     },
     // 登出
@@ -212,7 +215,10 @@ export default {
         this.$router.push(`/loginView?redirect=${this.$route.fullPath}`).catch(err=>err)
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
       })
     }
   },

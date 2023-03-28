@@ -152,6 +152,14 @@ export default {
   methods:{
     // 拆分IP地址
     getIP(ret) {
+      if(ret == null || ret == undefined || typeof(ret) != 'string'){
+        return {
+          ipNum1: 0,
+          ipNum2: 0,
+          ipNum3: 0,
+          ipNum4: 0
+        }
+      }
       let arr = ret.split('.');
       return {
         ipNum1: parseInt(arr[0]),
@@ -191,10 +199,14 @@ export default {
         // pnum
         this.ptNum = recvdata.ptNum
         this.pgNum = recvdata.pgNum
-      }).catch(err => {
-        // 输出错误信息
-        console.log(err.message)
       })
+      // .catch(err => {
+        // 输出错误信息
+        // console.log(err.message)
+        // ElMessageBox.alert('请求失败', '警告', {
+        //   confirmButtonText: 'OK'
+        // })
+      // })
     },
     // 判断IP是否合法
     isValidIP(ret) {
@@ -259,10 +271,13 @@ export default {
         this.nextStep(ret)
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
+        // 结束变为false
+        this.loading = false
       })
-      // 结束变为false
-      this.loading = false
     },
     // 下一步
     nextStep(ret) {

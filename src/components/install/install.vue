@@ -22,6 +22,7 @@
 import { nextTick } from 'vue'
 import { useStore } from 'vuex'
 import API from '@/api/ajax.js'; // 引入API
+import { ElMessageBox } from 'element-plus'
 export default {
   setup(){
     // 创建store对象
@@ -77,7 +78,10 @@ export default {
         }
       }).catch(err => {
         // 输出错误信息
-        console.log(err.message)
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
       })
     },
     PushInfo(ret){
@@ -127,13 +131,12 @@ export default {
             // console.log('----',sroll.scrollHeight)
           })
           if(recvdata.isEnd === true) {
-            // sleep(500)
+            // 等5s后再跳转
+            this.sleep1(5000,()=>{
+              this.isSucceed = true
+            })
             // this.logInfoList.push('***** 安装结束 *****')
-            this.isSucceed = true
           }
-        }).catch(err => {
-          // 输出错误信息
-          console.log(err.message)
         })
       },5000)
     }

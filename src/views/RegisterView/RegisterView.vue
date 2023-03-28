@@ -81,6 +81,7 @@
   import { ref } from 'vue-demi';
   import API from '@/api/ajax.js'; // 引入API
   import { ElMessage } from 'element-plus'
+  import { ElMessageBox } from 'element-plus'
   export default {
     setup() {
       // false时，显示小眼睛
@@ -244,7 +245,10 @@
           }
         }).catch(err => {
           // 输出错误信息
-          console.log(err.message)
+          // console.log(err.message)
+          ElMessageBox.alert('请求失败', '警告', {
+            confirmButtonText: 'OK'
+          })
         })
       }
     }

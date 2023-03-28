@@ -104,7 +104,8 @@
 <script>
 import { useStore } from "vuex";
 import { markRaw } from "@vue/reactivity";
-import { WEBSOCKET_PORT } from '@/api/port.js'
+import { IP,WEBSOCKET_PORT } from '@/api/port.js'
+import { ElMessageBox } from 'element-plus'
 export default {
   setup() {
     // 创建store对象
@@ -195,7 +196,7 @@ export default {
     },
     // wsNodeDisk
     initNodeDisk() {
-      this.wsNodeDisk = new WebSocket("ws://localhost:"+WEBSOCKET_PORT);
+      this.wsNodeDisk = new WebSocket("ws://"+IP+WEBSOCKET_PORT);
       this.wsNodeDisk.onopen = this.websocketonopen;
       this.wsNodeDisk.onerror = this.websocketonerror;
       this.wsNodeDisk.onmessage = this.websocketonmessage;
@@ -223,7 +224,9 @@ export default {
     },
     websocketonerror() {
       // 连接失败
-      // console.log("NodeDisk WebSocket连接失败");
+      ElMessageBox.alert('连接失败', '警告', {
+        confirmButtonText: 'OK'
+      })
     },
     websocketonmessage(ret) {
       // 数据接收
@@ -317,6 +320,7 @@ export default {
         },
         tooltip: {
           trigger: "axis",
+          valueFormatter: (value) => value.toString() + ' Kbps', // 提示框加上kbps
         },
         xAxis: {
           type: "category",
@@ -325,6 +329,9 @@ export default {
         yAxis: {
           boundaryGap: [0, "50%"],
           type: "value",
+          axisLabel: {
+            formatter: '{value} Kbps'
+          }
         },
         toolbox: {
           show: true,

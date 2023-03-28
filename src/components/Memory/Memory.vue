@@ -41,7 +41,8 @@
 <script>
 import { useStore } from 'vuex'
 import { markRaw } from '@vue/reactivity';
-import { WEBSOCKET_PORT } from '@/api/port.js'
+import { IP,WEBSOCKET_PORT } from '@/api/port.js'
+import { ElMessageBox } from 'element-plus'
 export default {
   setup () {
     // 创建store对象
@@ -102,7 +103,7 @@ export default {
   methods: {
     // wsNodeDisk
     initNodeMemory () {
-      this.wsNodeMemory = new WebSocket('ws://localhost:'+WEBSOCKET_PORT)
+      this.wsNodeMemory = new WebSocket("ws://"+IP+WEBSOCKET_PORT);
       this.wsNodeMemory.onopen = this.websocketonopen
       this.wsNodeMemory.onerror = this.websocketonerror
       this.wsNodeMemory.onmessage = this.websocketonmessage
@@ -126,7 +127,10 @@ export default {
       }))
     },
     websocketonerror() { // 连接失败
-        // console.log("NodeMemory WebSocket连接失败")
+      // console.log("NodeMemory WebSocket连接失败")
+      ElMessageBox.alert('连接失败', '警告', {
+        confirmButtonText: 'OK'
+      })
     },
     websocketonmessage(ret) { // 数据接收
         // 接收到的类似send的数据，其中sendData.data 是要接受的数据
@@ -187,7 +191,8 @@ export default {
           left: 20,
         },
         tooltip: {
-          trigger: 'axis'
+          trigger: 'axis',
+          valueFormatter: (value) => value.toString() + ' %', // 提示框加%
         },
         xAxis: {
           type: 'category',
@@ -196,7 +201,11 @@ export default {
         },
         yAxis: {
           boundaryGap: [0, '50%'],
-          type: 'value'
+          type: 'value',
+          max: 100.0,
+          axisLabel: {
+            formatter: '{value} %', // 纵坐标加上%
+          }
         },
         toolbox: {
           show: true,

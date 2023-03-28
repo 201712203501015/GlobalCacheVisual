@@ -81,7 +81,8 @@
 <script>
 import { useStore } from "vuex";
 import { markRaw } from '@vue/reactivity';
-import { WEBSOCKET_PORT } from '@/api/port.js'
+import { IP,WEBSOCKET_PORT } from '@/api/port.js'
+import { ElMessageBox } from 'element-plus'
 export default {
   setup() {
     // 创建store对象
@@ -145,7 +146,7 @@ export default {
   },
   methods: {
     initNodeNet() {
-      this.wsNodeNet = new WebSocket("ws://localhost:"+WEBSOCKET_PORT);
+      this.wsNodeNet = new WebSocket("ws://"+IP+WEBSOCKET_PORT);
       this.wsNodeNet.onopen = this.websocketonopen;
       this.wsNodeNet.onerror = this.websocketonerror;
       this.wsNodeNet.onmessage = this.websocketonmessage;
@@ -173,7 +174,9 @@ export default {
     },
     websocketonerror() {
       // 连接失败
-      // console.log("NodeNet WebSocket连接失败");
+      ElMessageBox.alert('连接失败', '警告', {
+        confirmButtonText: 'OK'
+      })
     },
     websocketonmessage(ret) {
       // 数据接收
@@ -257,7 +260,8 @@ export default {
           left: 20,
         },
         tooltip: {
-          trigger: 'axis'
+          trigger: 'axis',
+          valueFormatter: (value) => value.toString() + ' Kbps', // 提示框加上 kbps
         },
         legend: {
           data: ['发送数据', '接收数据'],
@@ -271,6 +275,9 @@ export default {
         yAxis: {
           boundaryGap: [0, "50%"],
           type: "value",
+          axisLabel: {
+            formatter: '{value} Kbps', // 纵坐标加上 kbps
+          }
         },
         toolbox: {
           show: true,

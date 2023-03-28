@@ -33,7 +33,8 @@
 <script>
 import { useStore } from "vuex";
 import { markRaw } from '@vue/reactivity';
-import { WEBSOCKET_PORT } from '@/api/port.js'
+import { IP,WEBSOCKET_PORT } from '@/api/port.js'
+import { ElMessageBox } from 'element-plus'
 export default {
   setup() {
     // 创建store对象
@@ -103,7 +104,7 @@ export default {
   methods: {
     // wsNodeList 初始化
     initNodeCpu() {
-      this.wsNodeCpu = new WebSocket("ws://localhost:"+WEBSOCKET_PORT);
+      this.wsNodeCpu = new WebSocket("ws://"+IP+WEBSOCKET_PORT);
       this.wsNodeCpu.onopen = this.websocketonopen;
       this.wsNodeCpu.onerror = this.websocketonerror;
       this.wsNodeCpu.onmessage = this.websocketonmessage;
@@ -130,7 +131,10 @@ export default {
     },
     websocketonerror() {
       // 连接失败
-      // console.log("NodeCpu WebSocket连接失败");
+      // console.log("NodeCpu WebSocket连接失败",err);
+      ElMessageBox.alert('连接失败', '警告', {
+        confirmButtonText: 'OK'
+      })
     },
     websocketonmessage(ret) {
       // 数据接收
@@ -147,7 +151,7 @@ export default {
         // 接收数据
         // sendData.params = sendData.params;
         // console.log("cpuData",sendData.data)
-        this.cpuUse = (sendData.params.cpuUse * 100.0).toFixed(2);
+        this.cpuUse = (sendData.params.cpuUse).toFixed(2); // 这里不*100
         this.workingTime.dd = this.to2Str(sendData.params.workingTime.dd);
         this.workingTime.hh = this.to2Str(sendData.params.workingTime.hh);
         this.workingTime.mm = this.to2Str(sendData.params.workingTime.mm);
@@ -213,7 +217,8 @@ export default {
           left: 20,
         },
         tooltip: {
-          trigger: 'axis'
+          trigger: 'axis',
+          valueFormatter: (value) => value.toString() + ' %', // 提示框加上%
         },
         xAxis: {
           type: "category",
@@ -223,6 +228,10 @@ export default {
         yAxis: {
           boundaryGap: [0, "50%"],
           type: "value",
+          max: 100.0,
+          axisLabel: {
+            formatter: '{value} %' // 纵坐标加上%
+          }
         },
         color: [
           "#516b91",
