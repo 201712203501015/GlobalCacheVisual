@@ -279,13 +279,13 @@
             // 正常状态
             // if(stateVal === 'NODE_STATE_RUNNING') {
                 // 调整颜色区间， > 0.5 是红色异常；<= 0.5 是正常状态 
-                if(0 <= colVal && colVal < 0.25) {
+                if(0 <= colVal && colVal < 25) {
                     cellDom['background-color'] = '#B4CDEF'
-                }else if(0.25 <= colVal && colVal < 0.5) {
+                }else if(25 <= colVal && colVal < 50) {
                     cellDom['background-color'] = '#98BAFE'
-                }else if(0.5 <= colVal && colVal < 0.75) {
+                }else if(50 <= colVal && colVal < 75) {
                     cellDom['background-color'] = '#5F94FD'
-                }else if(0.75 <= colVal && colVal < 1.0) {
+                }else if(75 <= colVal && colVal < 100) {
                     cellDom['background-color'] = '#023EB6'
                 }
             // }else{

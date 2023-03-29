@@ -5,15 +5,6 @@
       :class="{
         'unhealth-text':getHealth === 'running_0',
         'running_1':getHealth === 'running_1',
-        'running_2':getHealth === 'running_2',
-        'running_3':getHealth === 'running_3',
-        'running_4':getHealth === 'running_4',
-        'running_5':getHealth === 'running_5',
-        'running_6':getHealth === 'running_6',
-        'running_7':getHealth === 'running_7',
-        'running_8':getHealth === 'running_8',
-        'running_9':getHealth === 'running_9',
-        'running_10':getHealth === 'running_10',
         }"
     >
       <span style="font-weight: bold;"> Node{{ this.store.state.nowNodeId }}的健康状态是：{{ this.showHealthInfo(this.store.state.nowNodeHealth) }}</span>
@@ -70,18 +61,6 @@ export default {
 </script>
 
 <style>
-.health-text {
-  /* 字体居中 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #e1e3e7;
-  background-color: white;
-  color: black;
-}
 .unhealth-text {
   /* 字体居中 */
   display: flex;
@@ -104,104 +83,5 @@ export default {
   border: 1px solid #e1e3e7;
   background-color: white;
   color: black;
-}
-.running_2{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #98BAFE;
-  color: black;
-}
-.running_3{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #5F94FD;
-  color: black;
-}
-.running_4{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #023EB6;
-  color: black;
-}
-.running_5{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #3300FF;
-  color: white;
-}
-.running_6{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #9933FF;
-  color: white;
-}
-.running_7{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #FF0099;
-  color: white;
-}
-.running_8{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #CC0099;
-  color: white;
-}
-.running_9{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #FF6633;
-  color: white;
-}
-.running_10{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font:25px arial,sans-serif;
-  width: 100%;
-  height: 100%;
-  border: 2px solid;
-  background-color: #CC3300;
-  color: white;
 }
 </style>

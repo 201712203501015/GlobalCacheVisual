@@ -52,7 +52,7 @@ Mock.mock('http://localhost:8899/getLoginToken','post',(req) => {
       userName: '张三',
       password: '1234567',
       isSuperUser: 0,
-      isFinished: false // 是否完成自动化部署
+      isFinished: true // 是否完成自动化部署
     }
   }
 })
