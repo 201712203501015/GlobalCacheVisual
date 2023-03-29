@@ -248,6 +248,160 @@ Mock.mock('http://localhost:8899/getPgAll','post',(req) => {
   }
 })
 
+// 点击PT数据更新
+Mock.mock('http://localhost:8899/getPtUpdate','post',(req) => {
+  let ptList = []
+  let nodeList = []
+  // 制造180个Pt对象
+  for(let i=0;i<180;i++){
+    ptList.push({
+      ptId: i+5,
+      bv: 6,
+      state: (Math.floor(Math.random() * 100)%2 === 0 ? 'PT_STATE_OK' : 'PT_STATE_NOK'),
+      indexNode: 0,
+      ptInfo: [
+        [0,0,2],
+        [0,0,2]
+      ],
+      ioInfo: {
+        ioCount: 0,
+        readCount: 1,
+        readSize: 0,
+        writeCount: 0,
+        writeSize: 0
+      },
+      nodeIp:'175.34.8.' + (i%4)
+    })
+  }
+  // 制造node对象
+  for(let i=0;i<512;i++){
+    let diskList = []
+    // 制造两个disk
+    for(let i=0;i<2;i++){
+      let ptList1 = []
+      // PT对象
+      for(let i=0;i<5;i++){
+        ptList1.push({
+          ptId: i+5,
+          bv: 6,
+          state: (Math.floor(Math.random() * 100)%2 === 0 ? 'PT_STATE_OK' : 'PT_STATE_NOK'),
+          indexNode: 0,
+          ptInfo: [
+            [0,0,2],
+            [0,0,2]
+          ],
+          ioInfo: {
+            ioCount: 0,
+            readCount: 1,
+            readSize: 0,
+            writeCount: 0,
+            writeSize: 0
+          },
+          nodeIp:'175.34.8.' + (i%4)
+        })
+      }
+      // 每个（nodeId，diskId）对应一个ptList
+      diskList.push({
+        diskId: i+5,
+        ptList: ptList1
+      })
+    }
+    nodeList.push({
+      nodeId: i+5,
+      diskList: diskList
+    })
+  }
+  return {
+    data:{
+      nodeList: nodeList,
+      ptList: ptList
+    }
+  }
+})
+
+// 点击PG数据更新
+Mock.mock('http://localhost:8899/getPgUpdate','post',(req) => {
+  let pgList = []
+  let nodeList = []
+  // 制造180个Pg对象
+  for(let i=0;i<180;i++){
+    pgList.push({
+      pgId: i+5,
+      bv: 4,
+      state: (Math.floor(Math.random() * 100)%2 === 0 ? 'PG_STATE_NORMAL' : 'PG_STATE_DOWN'),
+      masterNode: 0,
+      masterDisk: 0,
+      copyNum: 3,
+      copyInfos: [
+        {
+          nodeId: 0,
+          diskId: 0,
+          copyState: 'PG_COPY_STATE_RUNNING'
+        },
+        {
+          nodeId: 1,
+          diskId: 2,
+          copyState: 'PG_COPY_STATE_RUNNING'
+        },
+        {
+          nodeId: 2,
+          diskId: 4,
+          copyState: 'PG_COPY_STATE_RUNNING'
+        }
+      ]
+    })
+  }
+  // 制造node对象
+  for(let i=0;i<512;i++){
+    let diskList = []
+    // 制造两个disk
+    for(let i=0;i<2;i++){
+      let pgList1 = []
+      // 制造5个Pg对象
+      for(let i=0;i<5;i++){
+        pgList1.push({
+          pgId: i+5,
+          bv: 4,
+          state: (Math.floor(Math.random() * 100)%2 === 0 ? 'PG_STATE_NORMAL' : 'PG_STATE_DOWN'),
+          masterNode: 0,
+          masterDisk: 0,
+          copyNum: 3,
+          copyInfos: [
+            {
+              nodeId: 0,
+              diskId: 0,
+              copyState: 'PG_COPY_STATE_RUNNING'
+            },
+            {
+              nodeId: 1,
+              diskId: 2,
+              copyState: 'PG_COPY_STATE_RUNNING'
+            },
+            {
+              nodeId: 2,
+              diskId: 4,
+              copyState: 'PG_COPY_STATE_RUNNING'
+            }
+          ]
+        })
+      }
+      diskList.push({
+        diskId: i+5,
+        pgList: pgList1
+      })
+    }
+    nodeList.push({
+      nodeId: i+5,
+      diskList: diskList
+    })
+  }
+  return {
+    data:{
+      nodeList: nodeList,
+      pgList: pgList
+    }
+  }
+})
 
 // （三）自动化部署部分
 // getIpList

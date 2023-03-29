@@ -10,7 +10,7 @@
          -->
         <el-col :span="5" style="width: 40px;display: flex;align-items: center;">
           <el-breadcrumb separator=">">
-            <el-breadcrumb-item @click="getNewData()">
+            <el-breadcrumb-item @click="updateData()">
               <span class="bread-style">
                 <b>PG总览</b>
               </span>
@@ -99,7 +99,7 @@
         </el-col>
         <!-- 刷新按钮 -->
         <el-col :span="3" style="width: 40px;">
-          <el-button type="primary" @click="getNewData">刷新数据</el-button>
+          <el-button type="primary" @click="updateData">刷新数据</el-button>
         </el-col>
       </el-row>
     </div>
@@ -400,6 +400,50 @@ export default {
       this.loading = true
       API({
         url: '/getPgAll',
+        method: 'post',
+        data: {
+          token: this.store.state.userToken,
+        }
+      }).then((res) => { // 请求成功后的操作，可以跳转
+        let recvdata = res.data.data;
+        // 1 刷新页面到getPtAll
+        this.nowMessage = "getPgAll"
+        // 2 更新总体信息
+        this.nodeListAll = recvdata.nodeList
+        this.pgListAll = recvdata.pgList
+        // 3 更新页面数据
+        this.updateWeb()
+        // 4 从Node视图跳转过来
+        this.pgNodeId = null
+        this.pgNodeIds = null
+        this.isDisableDisk = true // 禁用disk
+        if (this.$route.query.nodeId){
+          // 更改nodeId
+          this.pgNodeIds = parseInt(this.$route.query.nodeId);
+          // 改变节点
+          this.changeNode(this.pgNodeIds);
+          this.$route.query.nodeId = null
+        }
+        // 5 不显示Node、禁用disk
+        this.pgDiskId = null
+        this.pgDiskIds = null
+        // 6 不转圈圈
+        this.loading = false
+      }).catch(err => {
+        // 输出错误信息
+        // console.log(err.message)
+        ElMessageBox.alert('请求失败', '警告', {
+          confirmButtonText: 'OK'
+        })
+        // 5 不转圈圈
+        this.loading = false
+      })
+    },
+    // 点击刷新数据
+    updateData() {
+      this.loading = true
+      API({
+        url: '/getPgUpdate',
         method: 'post',
         data: {
           token: this.store.state.userToken,
