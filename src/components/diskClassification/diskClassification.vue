@@ -34,7 +34,7 @@
           <template #default="scope">
             <el-select v-model="this.ipList[ scope.row.id ].diskNum">
               <el-option
-                v-for="item in this.ipList[ scope.row.id ].diskSum"
+                v-for="(item,index) in this.ipList[ scope.row.id ].diskSum"
                 :key="item"
                 :label="item"
                 :value="item"
@@ -49,7 +49,7 @@
               <span>Cache盘数</span>
           </template>
           <template #default="scope">
-            <el-select v-model="this.ipList[ scope.row.id ].cephNum">
+            <el-select v-model="this.ipList[ scope.row.id ].cephNum" disabled>
               <el-option
                 v-for="(item,index) in this.ipList[ scope.row.id ].cephChoice"
                 :key="index"
@@ -172,28 +172,36 @@ export default {
       
       for(let i=0;i<tpipList.length;i++) {
         if(tpipList[i].ceph === true || tpipList[i].ceph1 === true) { // 筛选ceph节点
-          let cc = this.getFac(tpipList[i].dataDisk.length,tpipList[i].cacheDisk.length)
-          let ccNum = Math.min(cc[ cc.length - 1 ],tpipList[i].cacheDisk.length)
-          let DataDisk = this.addSelected(tpipList[i].dataDisk,tpipList[i].dataDisk.length)
-          let CacheDisk = this.addSelected(tpipList[i].cacheDisk,ccNum)
-          let diskListall = this.getListName(DataDisk)
+          // ceph 信息
+          let cephNum = 2;
+          let cephChoice = [2];
+          let CacheDisk = this.addSelected(tpipList[i].cacheDisk,cephNum) // 选好的
           let cephListall = this.getListName(CacheDisk)
+          let cachelist = this.getList('ceph',CacheDisk)
+          // disk 信息
+          let diskSum = this.getTwo(tpipList[i].dataDisk.length);
+          let diskNum = diskSum[ diskSum.length-1 ];
+          let DataDisk = this.addSelected(tpipList[i].dataDisk,tpipList[i].dataDisk.length)
+          let diskListall = this.getListName(DataDisk)
+          let disklist = this.getList('disk',DataDisk)
+          console.log("----==----",disklist);
+          
           this.ipList.push({
             id: jt,
             name: tpipList[i].name,
             roleName: tpipList[i].roleName,
-            cephChoice: cc, // new
-            diskNum: tpipList[i].dataDisk.length,
-            cephNum: ccNum,
-            diskSum: tpipList[i].dataDisk.length, // disk总数
-            cephSum: tpipList[i].cacheDisk.length, // ceph总数
+            cephChoice: cephChoice, // new
+            diskNum: diskNum,// 最后一位
+            cephNum: cephNum,
+            diskSum: diskSum, // disk总数
+            cephSum: cephNum, // ceph总数
             DataDisk: DataDisk, // Data盘列表
             CacheDisk: CacheDisk, // Cache盘列表
             // 页面展示，只有名称
             diskListall: diskListall, // 所有列表
             cephListall: cephListall,
-            disklist: this.getList('disk',tpipList[i].dataDisk), // 被选中的列表
-            cachelist: this.getList('ceph',tpipList[i].cacheDisk),
+            disklist: disklist, // 被选中的列表
+            cachelist: cachelist,
             // 是否能编辑
             isDiskEdit: true,
             isCephEdit: true,
@@ -231,13 +239,16 @@ export default {
       // 2 向后台发送数据
       let ipList = []
       for(let i=0;i<this.ipList.length;i++) {
+        let dataList = this.getDataList(this.ipList[i].disklist,this.ipList[i].DataDisk)
+        let cacheList = this.getDataList(this.ipList[i].cachelist,this.ipList[i].CacheDisk)
         ipList.push({
           name: this.ipList[i].name,
           roleName: this.ipList[i].roleName,
-          dataList: this.getDataList(this.ipList[i].disklist,this.ipList[i].DataDisk),
-          cacheList: this.getDataList(this.ipList[i].cachelist,this.ipList[i].CacheDisk),
+          dataList: dataList,
+          cacheList: cacheList,
         })
       }
+      
       this.loading = true
       API({
         url: '/getDiskClassification',
@@ -274,9 +285,9 @@ export default {
         for(let j=0;j<brr.length;j++) {
           if(arr[i] === brr[j].name) {
             ans.push({
-              id: i,
-              name: brr[i].name,
-              type: brr[i].type,
+              id: j,
+              name: brr[j].name,
+              type: brr[j].type,
             })
             break;
           }
@@ -317,6 +328,14 @@ export default {
         brr.push(arr[i].name)
       }
       return brr
+    },
+    // 只获取能%2的数
+    getTwo(val){
+      let arr = []
+      for(let i=2;i<=val;i+=2){
+        arr.push(i);
+      }
+      return arr
     },
     // 增加isSelected
     addSelected(arr,num) {
