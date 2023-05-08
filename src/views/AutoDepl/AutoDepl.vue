@@ -4,7 +4,7 @@
       <el-steps :active="activeStep" finish-status="success">
         <el-step title="添加节点" />
         <!-- <el-step title="硬件监测" /> -->
-        <el-step title="角色设置" />
+        <!-- <el-step title="角色设置" /> -->
         <el-step title="IP设置" />
         <el-step title="磁盘分类" />
         <el-step title="集群设置" />
@@ -15,12 +15,12 @@
       <!-- <el-button @click="nextStep(1)">我是按钮</el-button> -->
       <addNode v-if="this.activeStep === 0" :key="activeStep"></addNode>
       <!-- <hardwareDetect v-if="this.activeStep === 1" :key="activeStep"></hardwareDetect> -->
-      <roleSet v-if="this.activeStep === 1" :key="activeStep"></roleSet>
-      <ipSet v-if="this.activeStep === 2" :key="activeStep"></ipSet>
-      <diskClassification v-if="this.activeStep === 3" :key="activeStep"></diskClassification>
-      <clusterSet v-if="this.activeStep === 4" :key="activeStep"></clusterSet>
-      <affirmSet v-if="this.activeStep === 5" :key="activeStep"></affirmSet>
-      <install v-if="this.activeStep === 6" :key="activeStep"></install>
+      <!-- <roleSet v-if="this.activeStep === 1" :key="activeStep"></roleSet> -->
+      <ipSet v-if="this.activeStep === 1" :key="activeStep"></ipSet>
+      <diskClassification v-if="this.activeStep === 2" :key="activeStep"></diskClassification>
+      <clusterSet v-if="this.activeStep === 3" :key="activeStep"></clusterSet>
+      <affirmSet v-if="this.activeStep === 4" :key="activeStep"></affirmSet>
+      <install v-if="this.activeStep === 5" :key="activeStep"></install>
     </div>
   </div>
 </template>
@@ -44,7 +44,7 @@ export default {
   components: {
       addNode: defineAsyncComponent(() => import("@/components/addNode/addNode.vue")),
       // hardwareDetect: defineAsyncComponent(() => import("@/components/hardwareDetect/hardwareDetect.vue")),
-      roleSet: defineAsyncComponent(() => import("@/components/roleSet/roleSet.vue")),
+      // roleSet: defineAsyncComponent(() => import("@/components/roleSet/roleSet.vue")),
       ipSet: defineAsyncComponent(() => import("@/components/ipSet/ipSet.vue")),
       diskClassification: defineAsyncComponent(() => import("@/components/diskClassification/diskClassification.vue")),
       clusterSet: defineAsyncComponent(() => import("@/components/clusterSet/clusterSet.vue")),

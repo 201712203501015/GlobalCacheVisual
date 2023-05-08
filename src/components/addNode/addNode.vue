@@ -73,10 +73,16 @@
                 v-loading="loadingTable" v-if="ipList.length > 0" :data="ipList" height="500px"
               >
                 
-                <!-- 名称列 -->
-                <el-table-column label="名称">
+                <!-- IP名称列 -->
+                <el-table-column label="IP">
                   <template #default="scope">
                     <el-tag>{{ scope.row.name }}</el-tag>
+                  </template>
+                </el-table-column>
+                <!-- IP角色列 -->
+                <el-table-column label="名称">
+                  <template #default="scope">
+                    <el-tag :type="this.getTypeColor(scope.row.ceph1,scope.row.client,scope.row.ceph)">{{ scope.row.roleName }}</el-tag>
                   </template>
                 </el-table-column>
                 <!-- 能否连接 -->
@@ -356,6 +362,12 @@ export default {
         })
       }
     },
+    // 根据条件返回对应的颜色
+    getTypeColor(ceph1,client,ceph){
+      if(ceph1==true) return 'danger';
+      if(ceph==true) return 'warning';
+      return 'primary';
+    }
   },
   computed: {
     validIP() {

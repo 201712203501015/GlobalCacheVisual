@@ -93,6 +93,10 @@ export default {
             let ss = arr[i].trim()
             if(ss.length > 0) { // 不能全部都是空格
               this.logInfoList.push(ss);
+              if(this.logInfoList.length>500) // 长度不能大于500
+              {
+                this.logInfoList.shift(); // 删除第一项
+              }
             }
           }
         }
@@ -138,7 +142,7 @@ export default {
             // this.logInfoList.push('***** 安装结束 *****')
           }
         })
-      },5000)
+      },1000)
     }
   },
 }
