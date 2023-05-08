@@ -225,6 +225,11 @@ export default {
             isConnected: recvdata.isConnected,
             isCpu: recvdata.isCpu,
             isMemory: recvdata.isMemory,
+            // 返回数据的角色信息
+            ceph: recvdata.ceph,
+            client: recvdata.client,
+            ceph1: recvdata.ceph1,
+            roleName: recvdata.roleName,
           })
         }else{
           // alert('新增失败，'+recvdata.reason)

@@ -968,6 +968,11 @@ Mock.mock('http://localhost:8899/getAddIP','post',(req) => {
       isConnected: true,
       isCpu: true,
       isMemory: true,
+      // 返回数据的角色信息
+      ceph: true,
+      client: false,
+      ceph1: false,
+      roleName: 'ceph4',
       reason: 'ip添加成功'
     }
   }
