@@ -92,13 +92,28 @@ export default {
           if(arr[i] != null && arr[i] != undefined) { // 必须存在
             let ss = arr[i].trim()
             if(ss.length > 0) { // 不能全部都是空格
-              this.logInfoList.push(ss);
-              if(this.logInfoList.length>500) // 长度不能大于500
-              {
-                this.logInfoList.shift(); // 删除第一项
-              }
+              this.splitss(ss,160); // 存放数组，超过160就换行
             }
           }
+        }
+        console.log("数组长度是：",this.logInfoList.length);
+      }
+    },
+    // 更新数据
+    splitss(ss,val)
+    {
+      let arr = [];
+      for(let l=0;l<ss.length;l += val)
+      {
+        let r = Math.min(l+val,ss.length); // 右边界
+        arr.push(ss.substring(l,r));
+      }
+      for(let i=0;i<arr.length;i++)
+      {
+        this.logInfoList.push(arr[i]);
+        if(this.logInfoList.length>500) // 长度不能大于500
+        {
+          this.logInfoList.shift(); // 删除第一项
         }
       }
     },
