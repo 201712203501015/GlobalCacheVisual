@@ -22,8 +22,12 @@
             <td>{{ this.cnet }}</td>
           </tr>
           <tr>
-            <td>Network mask: </td>
-            <td>{{ this.netMask }}</td>
+            <td>Public network mask: </td>
+            <td>{{ this.pnetMask }}</td>
+          </tr>
+          <tr>
+            <td>Cluster network mask: </td>
+            <td>{{ this.cnetMask }}</td>
           </tr>
           <tr>
             <td>
@@ -198,7 +202,8 @@ export default {
       // 1 更新clusterSet
       this.pnet = recvdata.pnet
       this.cnet = recvdata.cnet
-      this.netMask = recvdata.netMask
+      this.pnetMask = recvdata.pubMask
+      this.cnetMask = recvdata.cluMask
       this.ptNum = recvdata.ptNum
       this.pgNum = recvdata.pgNum
       // 2 更新ceph1信息

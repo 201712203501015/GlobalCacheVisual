@@ -96,7 +96,6 @@ export default {
             }
           }
         }
-        console.log("数组长度是：",this.logInfoList.length);
       }
     },
     // 更新数据

@@ -50,23 +50,42 @@
               <el-input v-model="cnet.ipNum4" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
             </td>
           </tr>
-          <!-- Network Mask： -->
+          <!-- Public network Mask： -->
           <tr>
-            <td> Network Mask： </td>
+            <td> Public network Mask： </td>
             <td>
-              <el-input v-model="netMask.ipNum1" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
+              <el-input v-model="pnetMask.ipNum1" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
             </td>
             <td> . </td>
             <td>
-              <el-input v-model="netMask.ipNum2" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" /> 
+              <el-input v-model="pnetMask.ipNum2" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" /> 
             </td>
             <td> . </td>
             <td>
-              <el-input v-model="netMask.ipNum3" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
+              <el-input v-model="pnetMask.ipNum3" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
             </td>
             <td> . </td>
             <td>
-              <el-input v-model="netMask.ipNum4" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
+              <el-input v-model="pnetMask.ipNum4" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
+            </td>
+          </tr>
+          <!-- Cluster network Mask： -->
+          <tr>
+            <td> Cluster network Mask： </td>
+            <td>
+              <el-input v-model="cnetMask.ipNum1" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
+            </td>
+            <td> . </td>
+            <td>
+              <el-input v-model="cnetMask.ipNum2" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" /> 
+            </td>
+            <td> . </td>
+            <td>
+              <el-input v-model="cnetMask.ipNum3" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
+            </td>
+            <td> . </td>
+            <td>
+              <el-input v-model="cnetMask.ipNum4" placeholder="0" type="number" style="width: 100px;" oninput ="value=value.replace(/[^\d]/g, '')" />
             </td>
           </tr>
           <!-- PT与PG设置：-->
@@ -134,7 +153,13 @@ export default {
         ipNum3: 0,
         ipNum4: 0
       },
-      netMask:{
+      pnetMask:{
+        ipNum1: 0,
+        ipNum2: 0,
+        ipNum3: 0,
+        ipNum4: 0
+      },
+      cnetMask:{
         ipNum1: 0,
         ipNum2: 0,
         ipNum3: 0,
@@ -180,7 +205,8 @@ export default {
         let recvdata = res.data.data;
         let pnet = this.getIP(recvdata.pnet)
         let cnet = this.getIP(recvdata.cnet)
-        let netMask = this.getIP(recvdata.netMask)
+        let pnetMask = this.getIP(recvdata.pubMask);
+        let cnetMask = this.getIP(recvdata.cluMask);
         // pnet
         this.pnet.ipNum1 = pnet.ipNum1
         this.pnet.ipNum2 = pnet.ipNum2
@@ -191,11 +217,16 @@ export default {
         this.cnet.ipNum2 = cnet.ipNum2
         this.cnet.ipNum3 = cnet.ipNum3
         this.cnet.ipNum4 = cnet.ipNum4
-        // netMask
-        this.netMask.ipNum1 = netMask.ipNum1
-        this.netMask.ipNum2 = netMask.ipNum2
-        this.netMask.ipNum3 = netMask.ipNum3
-        this.netMask.ipNum4 = netMask.ipNum4
+        // pnetMask
+        this.pnetMask.ipNum1 = pnetMask.ipNum1
+        this.pnetMask.ipNum2 = pnetMask.ipNum2
+        this.pnetMask.ipNum3 = pnetMask.ipNum3
+        this.pnetMask.ipNum4 = pnetMask.ipNum4
+        // cnetMask
+        this.cnetMask.ipNum1 = cnetMask.ipNum1
+        this.cnetMask.ipNum2 = cnetMask.ipNum2
+        this.cnetMask.ipNum3 = cnetMask.ipNum3
+        this.cnetMask.ipNum4 = cnetMask.ipNum4
         // pnum
         this.ptNum = recvdata.ptNum
         this.pgNum = recvdata.pgNum
@@ -232,15 +263,18 @@ export default {
       // 1 检查IP是否合法
       let pnet = null
       let cnet = null
-      let netMask = null
+      let pnetMask = null
+      let cnetMask = null
       if(this.isValidIP(this.pnet) === true &&
         this.isValidIP(this.cnet) === true &&
-        this.isValidIP(this.netMask) === true &&
+        this.isValidIP(this.pnetMask) === true &&
+        this.isValidIP(this.cnetMask) === true &&
         this.ptNum >= 0 && this.ptNum <= 4096 &&
         this.pgNum >= 0 && this.pgNum <= 4096) {
           pnet = this.IPToString(this.pnet)
           cnet = this.IPToString(this.cnet)
-          netMask = this.IPToString(this.netMask)
+          pnetMask = this.IPToString(this.pnetMask)
+          cnetMask = this.IPToString(this.cnetMask)
       }else{
         // alert('IP地址不合法，请输入正确的IP地址')
         ElMessage.error('IP地址或者PT、PG数量不合法，请输入正确的IP地址、PT和PG数量')
@@ -255,7 +289,8 @@ export default {
           token: this.store.state.userToken,
           pnet: pnet,
           cnet: cnet,
-          netMask: netMask,
+          pubMask: pnetMask,
+          cluMask: cnetMask,
           ptNum: this.ptNum,
           pgNum: this.pgNum,
         }

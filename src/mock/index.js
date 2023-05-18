@@ -1063,7 +1063,8 @@ Mock.mock('http://localhost:8899/getClusterInfo','post',(req) => {
     data:{
       pnet: '192.168.0.0',
       cnet: '192.168.0.0',
-      netMask: '192.168.0.0',
+      pubMask: '192.168.1.1',
+      cluMask: '192.168.1.2',
       ptNum: 360,
       pgNum: 360,
     }
@@ -1077,7 +1078,8 @@ Mock.mock('http://localhost:8899/getAffirmSet','post',(req) => {
       // 1 clusterSet
       pnet: '192.168.0.0',
       cnet: '192.168.0.0',
-      netMask: '192.168.0.0',
+      pubMask: '192.168.1.1',
+      cluMask: '192.168.1.2',
       ptNum: 360,
       pgNum: 360,
       // 2 ceph1 信息
