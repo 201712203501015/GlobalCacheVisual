@@ -169,22 +169,37 @@ export default {
       this.ipList = [] // 清空数组
       let tpipList = recvdata.ipList
       let jt = 0;
-      
+      // console.log("11c"); // 测试完毕，从上一步/下一步到当前页面会更新
       for(let i=0;i<tpipList.length;i++) {
         if(tpipList[i].ceph === true || tpipList[i].ceph1 === true) { // 筛选ceph节点
           // ceph 信息
+          let cephListall = this.getListName(tpipList[i].cacheDisk)  // 全部的ceph
           let cephNum = 2;
           let cephChoice = [2];
           let CacheDisk = this.addSelected(tpipList[i].cacheDisk,cephNum) // 选好的
-          let cephListall = this.getListName(CacheDisk)
           let cachelist = this.getList('ceph',CacheDisk)
           // disk 信息
-          let diskSum = this.getTwo(tpipList[i].dataDisk.length);
-          let diskNum = diskSum[ diskSum.length-1 ];
-          let DataDisk = this.addSelected(tpipList[i].dataDisk,tpipList[i].dataDisk.length)
-          let diskListall = this.getListName(DataDisk)
-          let disklist = this.getList('disk',DataDisk)
-          console.log("----==----",disklist);
+          let diskListall = this.getListName(tpipList[i].dataDisk) // 全部的disk
+          // 初始化
+          let diskSum = null
+          let diskNum = null
+          let DataDisk = null
+          let disklist = null
+          // case1：dataList为空，即后端没传
+          if( (tpipList[i].dataList.length === 0) || (tpipList[i].dataList.length%2 != 0) )
+          {
+            diskSum = this.getTwo(tpipList[i].dataDisk.length);
+            diskNum = diskSum[ diskSum.length-1 ];
+            DataDisk = this.addSelected(tpipList[i].dataDisk,tpipList[i].dataDisk.length)
+            disklist = this.getList('disk',DataDisk)
+          }
+          // case2: dataList非空，即dataList已经选好
+          else{
+            diskSum = this.getTwo(tpipList[i].dataDisk.length);
+            diskNum = tpipList[i].dataList.length // 长度已经选好
+            DataDisk = this.addSelected1(tpipList[i].dataDisk,tpipList[i].dataList) // 选出对应磁盘
+            disklist = this.getList('disk',DataDisk)
+          }
           
           this.ipList.push({
             id: jt,
@@ -241,6 +256,8 @@ export default {
       for(let i=0;i<this.ipList.length;i++) {
         let dataList = this.getDataList(this.ipList[i].disklist,this.ipList[i].DataDisk)
         let cacheList = this.getDataList(this.ipList[i].cachelist,this.ipList[i].CacheDisk)
+        // console.log('dataList = ',dataList); // 检测完毕，设置成功
+        // console.log('cacheList = ',cacheList); // 检测完毕，设置成功
         ipList.push({
           name: this.ipList[i].name,
           roleName: this.ipList[i].roleName,
@@ -343,6 +360,22 @@ export default {
         arr[i]['isSelected'] = (i<num ? true : false)
       }
       return arr
+    },
+    // 增加isSelected1
+    addSelected1(arr,arr_sd) {
+      // console.log("接受的数据：",arr,arr_sd);
+      let arr1 = JSON.parse(JSON.stringify(arr));
+      for(let i=0;i<arr.length;i++) {
+        let fg = false;
+        for(let j=0;j<arr_sd.length;j++) {
+          if(arr[i].name === arr_sd[j].name){
+            fg = true;
+            break;
+          }
+        }
+        arr1[i]['isSelected'] = fg;
+      }
+      return arr1
     },
     // 更新列表数据
     getList(name,alist) {

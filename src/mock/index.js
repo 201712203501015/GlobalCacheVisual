@@ -495,9 +495,9 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
             },
             {
                 id: 3,
-                name: 'SDD',
+                name: 'SDE',
                 type: 'SD'
-            },
+            }
           ], // Data盘列表
           cacheList: [
             {
