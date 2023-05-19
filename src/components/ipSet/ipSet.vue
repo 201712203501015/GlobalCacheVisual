@@ -60,9 +60,9 @@
               style="width: 200px;"
               ></el-input>
             &nbsp;
-            <el-tag @click="changeState('localIPv4',1,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 1}">edit</el-tag>
+            <el-tag @click="changeState('pubIPv4',1,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 1}">edit</el-tag>
             &nbsp;
-            <el-tag @click="changeState('localIPv4',0,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 0}">set</el-tag>
+            <el-tag @click="changeState('pubIPv4',0,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 0}">set</el-tag>
           </template>
         </el-table-column>
         <!-- Cluster IPv4 -->
@@ -296,6 +296,19 @@ export default {
           }
         }else{
           this.ipList[id].clusterIPv4State = 1
+        }
+      }else if(name === 'pubIPv4') {
+        // 修改clusterIPv4
+        if(state === 0) {
+          // 检验是否合格
+          if(this.isValidIP(this.ipList[id].pubIPv4) === true) {
+            this.ipList[id].pubIPv4State = 0
+          }else{
+            // alert('输入的ip不合法，请重新输入')
+            ElMessage.error('输入的ip不合法，请重新输入')
+          }
+        }else{
+          this.ipList[id].pubIPv4State = 1
         }
       }
     }
