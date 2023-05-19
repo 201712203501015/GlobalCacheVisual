@@ -82,7 +82,7 @@
                 <!-- IP角色列 -->
                 <el-table-column label="名称">
                   <template #default="scope">
-                    <el-tag :type="this.getTypeColor(scope.row.ceph1,scope.row.client,scope.row.ceph)">{{ scope.row.roleName }}</el-tag>
+                    <el-tag :class="this.getTypeColor(scope.row.ceph1,scope.row.client,scope.row.ceph)">{{ scope.row.roleName }}</el-tag>
                   </template>
                 </el-table-column>
                 <!-- 能否连接 -->
@@ -369,9 +369,9 @@ export default {
     },
     // 根据条件返回对应的颜色
     getTypeColor(ceph1,client,ceph){
-      if(ceph1==true) return 'danger';
-      if(ceph==true) return 'warning';
-      return 'primary';
+      if(ceph1==true) return 'red-tag';
+      if(ceph==true) return 'orange-tag';
+      return 'blue-tag';
     }
   },
   computed: {
@@ -402,5 +402,20 @@ export default {
   width: 100%;
   align-items: center;
   justify-content: center;
+}
+
+.red-tag {
+  color: #f56c6c;
+  background-color: #fde2e2;
+}
+
+.orange-tag {
+  color: #e6a23c;
+  background-color: #fdf6ec;
+}
+
+.blue-tag {
+  color: #409eff;
+  background-color: #ecf5ff;
 }
 </style>

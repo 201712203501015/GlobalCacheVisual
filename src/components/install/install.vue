@@ -1,13 +1,20 @@
 <template>
   <!-- 开始安装 -->
   <div class="install-com">
-    <el-row class="install-top">
+    <div class="install-top">
       <h3>安装日志信息</h3>
-    </el-row>
+    </div>
+    <div class="install-title">
+      安装步骤
+    </div>
     <div class="install-box">
-      <ul id="sroll" class="infinite-list" style="overflow: auto">
-        <li v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ item }}</li>
-      </ul>
+      <!-- <div id="sroll" class="infinite-list" style="overflow: auto;flex-grow:2;overflow-y:auto;overflow-x:hidden;">
+        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ item }}</p>
+      </div> -->
+      <!-- 测试，自动换行 -->
+      <div id="sroll" class="infinite-list" style="overflow-y:auto;overflow-x:none;white-space: pre;">
+        {{ strcontent }}
+      </div>
       <!-- <span v-else class="ck" @click="changeFinish">
         <b>恭喜你安装成功</b>
       </span> -->
@@ -41,6 +48,8 @@ export default {
       isSucceed: false,
       // sroll
       sroll: null,
+      // 字符串信息
+      strcontent: "",
     }
   },
   mounted() {
@@ -62,6 +71,7 @@ export default {
     },
     // 像后端发送安装请求
     sendInstall() {
+      this.strcontent += "正在请求安装......\n"
       this.logInfoList.push('正在请求安装......')
       API({
         url: '/getBeginInstall',
@@ -73,6 +83,7 @@ export default {
         let recvdata = res.data.data
         // 可以开始了，像后端建立连接
         if(recvdata.isBegin === true) {
+          this.strcontent += "***** 开始安装 *****\n"
           this.logInfoList.push('***** 开始安装 *****')
           this.Start();
         }
@@ -92,7 +103,12 @@ export default {
           if(arr[i] != null && arr[i] != undefined) { // 必须存在
             let ss = arr[i].trim()
             if(ss.length > 0) { // 不能全部都是空格
-              this.splitss(ss,160); // 存放数组，超过160就换行
+              // this.splitss(ss,160); // 存放数组，超过160就换行
+              this.logInfoList.push(ss);
+              if(this.logInfoList.length > 500)
+              {
+                this.logInfoList.shift(); // 删除第一项
+              }
             }
           }
         }
@@ -142,7 +158,13 @@ export default {
         }).then((res) => {
           let recvdata = res.data.data
           // this.logInfoList.push(recvdata.installLogInfo)
-          this.PushInfo(recvdata.installLogInfo)
+          // this.PushInfo(recvdata.installLogInfo) // 5-19 弃用
+          this.strcontent += recvdata.installLogInfo // 更新字符串
+          // 字符串长度小于100000，防止渲染不了
+          if(this.strcontent.length > 100000)
+          {
+            this.strcontent = this.strcontent.substring(-100000);
+          }
           nextTick(() => {
             let sroll = document.getElementById('sroll');
             sroll.scrollTop = sroll.scrollHeight
@@ -164,21 +186,36 @@ export default {
 
 <style>
 .install-com {
-  margin: 20px;
+  margin: 10px;
 }
 .infinite-list {
-  height: 400px;
+  height: 280px;
   width: 90%;
+  word-break: break-all;
+  word-wrap: break-word;
   /* padding: 0;
   margin: 0; 
   list-style: none;*/
 }
+
+.install-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  height: 160px;
+  width: calc(100% - 40px);
+  border: 2px solid black;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
 .install-box {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  height: 500px;
+  padding: 10px;
+  height: 300px;
   width: calc(100% - 40px);
   border: 2px solid black;
   border-radius: 4px;
@@ -190,5 +227,16 @@ export default {
 }
 .ck {
   cursor: pointer;
+}
+.text-wrapper {
+  /* list-style: none; */
+  /* display:inline-block; */
+  /* float:left; */
+  /* overflow:visible; */
+  height: 100%;
+  min-height:10px; 
+  max-height:300px;
+  word-break: break-all;
+  word-wrap: break-word;
 }
 </style>

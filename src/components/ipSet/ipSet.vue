@@ -47,6 +47,24 @@
             <el-tag @click="changeState('localIPv4',0,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].localIPv4State === 0}">set</el-tag>
           </template>
         </el-table-column>
+        <!-- Public IPv4 -->
+        <el-table-column>
+          <template #header>
+              <span>Public IPv4</span>
+          </template>
+          <template #default="scope">
+            <!-- <el-tag>{{ scope.row.localIPv4 }}</el-tag> -->
+            <el-input 
+              v-model="this.ipList[ scope.row.id ].pubIPv4" 
+              :disabled="this.ipList[ scope.row.id ].pubIPv4State === 0 ? true: false"
+              style="width: 200px;"
+              ></el-input>
+            &nbsp;
+            <el-tag @click="changeState('localIPv4',1,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 1}">edit</el-tag>
+            &nbsp;
+            <el-tag @click="changeState('localIPv4',0,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 0}">set</el-tag>
+          </template>
+        </el-table-column>
         <!-- Cluster IPv4 -->
         <el-table-column>
           <template #header>
@@ -119,8 +137,10 @@ export default {
             roleName: tpipList[i].roleName,
             localIPv4: tpipList[i].localIPv4,
             clusterIPv4: tpipList[i].clusterIPv4,
+            pubIPv4: tpipList[i].remoteIPv4,
             localIPv4State: 0, // 0表示不能更改，1表示可以更改
             clusterIPv4State: 0,
+            pubIPv4State: 0,
           })
           j += 1
         }

@@ -173,7 +173,8 @@ export default {
       // 1 clusterSet
       pnet: null,
       cnet: null,
-      netMask: null,
+      cnetMask: null,
+      pnetMask: null,
       ptNum: 0,
       pgNum: 0,
       // 2 ceph1信息
