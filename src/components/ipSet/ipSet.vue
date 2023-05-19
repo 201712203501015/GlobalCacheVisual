@@ -161,20 +161,22 @@ export default {
       // 2 确保每个IP的 localIPv4、clusterIPv4都不一样
       const localIPv4 = new Set()
       const clusterIPv4 = new Set()
+      const pubIPv4 = new Set()
       for(let i=0;i<this.ipList.length;i++) {
-        if(this.ipList[i].localIPv4State === 1 || this.ipList[i].clusterIPv4State === 1) {
+        if(this.ipList[i].localIPv4State === 1 || this.ipList[i].clusterIPv4State === 1 || this.ipList[i].pubIPv4State === 1) {
           fg = false
         }
-        if(clusterIPv4.has(this.ipList[i].clusterIPv4) === true || localIPv4.has(this.ipList[i].localIPv4) === true){
+        if(clusterIPv4.has(this.ipList[i].clusterIPv4) === true || localIPv4.has(this.ipList[i].localIPv4) === true || pubIPv4.has(this.ipList[i].pubIPv4)){
           fg = false
         }
         localIPv4.add(this.ipList[i].localIPv4)
         clusterIPv4.add(this.ipList[i].clusterIPv4)
+        pubIPv4.add(this.ipList[i].pubIPv4)
       }
       if(fg === false){
         // alert('请确保每个ip都set了')
         ElMessage({
-          message: '请确保每个ip都set了，并且clusterIPv4和localIPv4都不一样',
+          message: '请确保每个ip都set了，并且clusterIPv4，pubIPv4和localIPv4都不一样',
           type: 'warning',
         })
         return ;
@@ -186,9 +188,11 @@ export default {
           name: this.ipList[i].name,
           roleName: this.ipList[i].roleName,
           localIPv4: this.ipList[i].localIPv4,
-          clusterIPv4: this.ipList[i].clusterIPv4
+          clusterIPv4: this.ipList[i].clusterIPv4,
+          remoteIPv4: this.ipList[i].pubIPv4
         })
       }
+      console.log('收到数据ipList = ',ipList);
       this.loading = true
       API({
         url: '/getIPSet',
