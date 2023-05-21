@@ -192,7 +192,7 @@ export default {
           remoteIPv4: this.ipList[i].pubIPv4
         })
       }
-      console.log('收到数据ipList = ',ipList);
+      // console.log('收到数据ipList = ',ipList);
       this.loading = true
       API({
         url: '/getIPSet',

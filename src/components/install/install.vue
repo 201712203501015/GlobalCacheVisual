@@ -23,10 +23,16 @@
       </span> -->
     </div>
     <div style="margin-top: 10px; align-items: center;justify-content: center;display: flex;">
+      <!-- 开始按钮，点击这个按钮再开始安装 -->
+      <el-button v-if="installProcess===0" type="primary" @click="Start()">开始安装</el-button>
       <!-- 下一步按钮 -->
-      <el-button v-if="isSucceed===false && nowEnd===true" type="primary" @click="Start()">下一步</el-button>
+      <el-button v-if="installProcess===2" type="primary" @click="Start()">下一步</el-button>
+      <!-- 重新安装 -->
+      <el-button v-if="installProcess===3" type="primary" @click="Start()">重新安装</el-button>
+      <!-- 安装中 -->
+      <el-button v-if="installProcess===1" type="primary" disabled>安装中</el-button>
       <!-- 完成按钮 -->
-      <el-button v-if="isSucceed" type="primary" @click="goto('userView')">完成</el-button>
+      <el-button v-if="installProcess===4" type="primary" @click="goto('userView')">完成</el-button>
     </div>
   </div>
 </template>
@@ -52,8 +58,6 @@ export default {
       timeId: null,
       // 记录安装步骤---名称
       logInfoList: [],
-      // 安装成功
-      isSucceed: false,
       // sroll
       sroll: null,
       // 字符串信息
@@ -62,11 +66,13 @@ export default {
       nowStep: 0,
       // 第几步是否安装完毕,true状态下是禁用 下一步 按钮
       nowEnd: false,
+      // 安装进程，0-安装未开始，1-安装中，2-下一步，3-重新安装，4-安装完毕
+      installProcess: 0,
     }
   },
   mounted() {
     // console.log("111,",document.getElementById('sroll').clientHeight)
-    this.sendInstall()
+    // this.sendInstall()
   },
   unmounted() {
     if(this.timeId != null) {
@@ -80,28 +86,6 @@ export default {
       // 2 将activeStep = 0,isReady = false，同时跳转到一开始
       this.store.commit('changeActiveStep',0)
       this.store.commit('changeIsReady',false)
-    },
-    // 像后端发送安装请求
-    sendInstall() {
-      API({
-        url: '/getBeginInstall',
-        method: 'post',
-        data: {
-          token: this.store.state.userToken,
-        }
-      }).then((res) => {
-        let recvdata = res.data.data
-        // 可以开始了，像后端建立连接
-        if(recvdata.isBegin === true) {
-          this.Start();
-        }
-      }).catch(err => {
-        // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
-        })
-      })
     },
     PushInfo(ret){
       if(ret != null && ret != null && typeof(ret) === 'string') {
@@ -145,7 +129,7 @@ export default {
     },
     // 跳转
     async goto(path) {
-      if(this.isSucceed === true) {
+      if(this.installProcess === 4) {
         await this.store.dispatch('getInfo').then(() => {
           // 回退到一开始
           this.store.commit('changeActiveStep',0)
@@ -155,9 +139,11 @@ export default {
       }
     },
     Start() {
-      console.log("调用了start")
-      // 关闭下一步按钮
-      this.nowEnd = false
+      this.installProcess = 1; // 改变当前安装状态
+      // let nowEnd = false
+      // if(this.installProcess === 2 || this.installProcess === 3) {
+      //   nowEnd = true
+      // }
       // 每隔3s向后端请求一次
       this.timeId = setInterval(() => {
         API({
@@ -165,8 +151,8 @@ export default {
           method: 'post',
           data: {
            token: this.store.state.userToken, 
-           nowStep: this.nowStep, // 当前是第几步
-           nowEnd: this.nowEnd, // 第几步是否结束
+          //  nowStep: this.nowStep, // 当前是第几步
+          //  nowEnd: nowEnd, // 第几步是否结束
           }
         }).then((res) => {
           let recvdata = res.data.data
@@ -178,6 +164,7 @@ export default {
             this.strcontent = "" // 清空数组
             this.strcontent += "正在请求安装......\n"
             this.strcontent += "***** 开始安装 *****\n"
+            this.installProcess = 1; // 改变当前安装状态
           }
 
           // 和当前step 一样
@@ -198,15 +185,23 @@ export default {
             // (1) 整体安装是否完毕?
             if(recvdata.isEnd === true) {
               // 等5s后再跳转,显示 安装完毕
-              this.sleep1(5000,()=>{
-                this.isSucceed = true
-              })
+              // this.sleep1(5000,()=>{
+                console.log('---');
+                this.installProcess = 4 // 安装完毕
+                clearInterval(this.timeId); // 销毁定时器
+                return 
+              // })
             }
             // (2) 第step步是否安装完毕,显示安装下一步
             if(recvdata.nowEnd === true) {
-              this.nowEnd = true // 开启 下一步 按钮
-              console.log("当前nowEnd = ",this.nowEnd);
+              if(recvdata.nowSuccess === false) { // 重新安装当前这步
+                this.installProcess = 3
+              }
+              else {
+                this.installProcess = 2 // 开启 下一步 按钮
+              }
               clearInterval(this.timeId); // 销毁定时器
+              return 
             }
           }
           

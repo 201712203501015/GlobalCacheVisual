@@ -1222,11 +1222,12 @@ timeId = setInterval(()=>{
 Mock.mock('http://localhost:8899/getStartInstall','post',(req) => {
   return {
     data:{
-      nowStep: step,
+      nowStep: 1,
       nowEnd: true,
+      nowSuccess: false, // 当前安装是否安装成功
       nowName: '安装相关包' + step.toString(),
       installLogInfo: installInfo, // 安装日志信息
-      isEnd: isEnd,
+      isEnd: true,
     }
   }
 })
