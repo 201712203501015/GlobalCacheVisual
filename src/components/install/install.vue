@@ -139,6 +139,7 @@ export default {
       }
     },
     Start() {
+      clearInterval(this.timeId);
       this.installProcess = 1; // 改变当前安装状态
       // let nowEnd = false
       // if(this.installProcess === 2 || this.installProcess === 3) {
@@ -146,6 +147,7 @@ export default {
       // }
       // 每隔3s向后端请求一次
       this.timeId = setInterval(() => {
+        // console.log('定时器在运行');
         API({
           url: '/getStartInstall',
           method: 'post',
@@ -185,11 +187,10 @@ export default {
             // (1) 整体安装是否完毕?
             if(recvdata.isEnd === true) {
               // 等5s后再跳转,显示 安装完毕
-              // this.sleep1(5000,()=>{
-                console.log('---');
+              // this.sleep1(1000,()=>{
                 this.installProcess = 4 // 安装完毕
                 clearInterval(this.timeId); // 销毁定时器
-                return 
+                // console.log('-1')
               // })
             }
             // (2) 第step步是否安装完毕,显示安装下一步
@@ -201,7 +202,7 @@ export default {
                 this.installProcess = 2 // 开启 下一步 按钮
               }
               clearInterval(this.timeId); // 销毁定时器
-              return 
+              // console.log('-1')
             }
           }
           

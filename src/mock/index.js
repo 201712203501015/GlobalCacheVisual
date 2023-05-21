@@ -1224,10 +1224,10 @@ Mock.mock('http://localhost:8899/getStartInstall','post',(req) => {
     data:{
       nowStep: 1,
       nowEnd: true,
-      nowSuccess: false, // 当前安装是否安装成功
+      nowSuccess: (step%2==0 ? true: false), // 当前安装是否安装成功
       nowName: '安装相关包' + step.toString(),
       installLogInfo: installInfo, // 安装日志信息
-      isEnd: true,
+      isEnd: false,
     }
   }
 })
