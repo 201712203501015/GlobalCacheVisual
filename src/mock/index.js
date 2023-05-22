@@ -1199,35 +1199,23 @@ Mock.mock('http://localhost:8899/getAffirmSet','post',(req) => {
   }
 })
 
-// getBeginInstall
-Mock.mock('http://localhost:8899/getBeginInstall','post',(req) => {
+// getInstall
+Mock.mock('http://localhost:8899/getInstall','post',(req) => {
   return {
     data:{
-      isBegin: true, // 能否开始安装
+      nowName: '安装相关包',
     }
   }
 })
 
-// getStartInstall
-let step = 1;
-let isEnd = false;
-let timeId = -1
-timeId = setInterval(()=>{
-  step += 1; // 5s一更新
-  if(step === 10){
-    isEnd = true;
-    clearInterval(timeId);
-  }
-},5000);
-Mock.mock('http://localhost:8899/getStartInstall','post',(req) => {
+// getLog
+Mock.mock('http://localhost:8899/getLog','post',(req) => {
   return {
-    data:{
-      nowStep: 1,
-      nowEnd: true,
-      nowSuccess: (step%2==0 ? true: false), // 当前安装是否安装成功
-      nowName: '安装相关包' + step.toString(),
+    data: {
+      nowEnd: false,
+      nowSuccess: false, // 当前安装是否安装成功
       installLogInfo: installInfo, // 安装日志信息
-      isEnd: false,
+      isEnd: true,
     }
   }
 })

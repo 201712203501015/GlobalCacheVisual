@@ -341,7 +341,7 @@ export default {
     },
     beforeNextStep (ret) {
       // 1 判断合法IP个数
-      if(this.connectIP < 4) {
+      if(this.validIP < 4) {
         // alert('IP节点数量不足4个，请保证至少有4个IP节点')
         ElMessage({
           message: '合法IP节点数量不足4个，请保证至少有4个合法的IP节点',
