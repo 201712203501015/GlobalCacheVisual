@@ -25,14 +25,16 @@
     <div style="margin-top: 10px; align-items: center;justify-content: center;display: flex;">
       <!-- 开始按钮，点击这个按钮再开始安装 -->
       <el-button v-if="installProcess===0" type="primary" @click="Start(false)">开始安装</el-button>
-      <!-- 下一步按钮 -->
-      <el-button v-if="installProcess===2" type="primary" @click="Start(true)">下一步</el-button>
-      <!-- 重新安装 -->
-      <el-button v-if="installProcess===3" type="primary" @click="Start(false)">重新安装</el-button>
       <!-- 安装中 -->
       <el-button v-if="installProcess===1" type="primary" disabled>安装中</el-button>
+
+      <!-- 下一步按钮 -->
+      <el-button v-if="nowSuccess===1" type="primary" @click="Start(true)">下一步</el-button>
+      <!-- 重新安装 -->
+      <el-button v-if="nowSuccess===2" type="primary" @click="Start(false)">重新安装</el-button>
+      
       <!-- 完成按钮 -->
-      <el-button v-if="installProcess===4" type="primary" @click="goto('userView')">完成</el-button>
+      <el-button v-if="isEnd===1" type="primary" @click="goto('userView')">完成</el-button>
     </div>
   </div>
 </template>
@@ -66,8 +68,12 @@ export default {
       nowStep: 0,
       // 第几步是否安装完毕,true状态下是禁用 下一步 按钮
       nowEnd: false,
-      // 安装进程，0-安装未开始，1-安装中，2-下一步，3-重新安装，4-安装完毕
+      // 安装进程，0-安装未开始，1-安装中
       installProcess: 0,
+      // 下一步 标志 0-不显示，1-下一步，2-重新安装
+      nowSuccess: 0,
+      // 安装完毕 标志，0-未完成，1-安装完毕
+      isEnd: 0,
     }
   },
   mounted() {
@@ -141,9 +147,14 @@ export default {
     Start(cl) {
       clearInterval(this.timeId);
       this.installProcess = 1; // 改变当前安装状态
+      // 其他按钮不显示
+      this.isEnd = 0;
+      this.nowSuccess = 0;
       if(cl === true) {
         this.strcontent = "" // 清空数组
       }
+      let hulue = false // 用于忽略其他信号
+      let nowCount = 1 // 给后端编号
       // let nowEnd = false
       // if(this.installProcess === 2 || this.installProcess === 3) {
       //   nowEnd = true
@@ -155,58 +166,71 @@ export default {
           url: '/getStartInstall',
           method: 'post',
           data: {
-           token: this.store.state.userToken, 
+           token: this.store.state.userToken,
+           nowCount: nowCount++, 
            nowStep: this.nowStep, // 当前是第几步
           //  nowEnd: nowEnd, // 第几步是否结束
           }
         }).then((res) => {
           let recvdata = res.data.data
-          if(this.stepSet.has(recvdata.nowStep)===false) { // 新的一步
-            this.stepSet.add(recvdata.nowStep);
-            this.logInfoList.push(recvdata.nowName);
-            this.nowStep = recvdata.nowStep; // 第几步(当前)
-            // 更新显示内容
-            // this.strcontent = "" // 清空数组
-            // this.strcontent += "正在请求安装......\n"
-            // this.strcontent += "***** 开始安装 *****\n"
-            this.installProcess = 1; // 改变当前安装状态
-          }
+          if(hulue===false) { // 只有false才处理
+            if(this.stepSet.has(recvdata.nowStep)===false) { // 新的一步
+              this.stepSet.add(recvdata.nowStep);
+              this.logInfoList.push(recvdata.nowName);
+              this.nowStep = recvdata.nowStep; // 第几步(当前)
+              // 更新显示内容
+              // this.strcontent = "" // 清空数组
+              // this.strcontent += "正在请求安装......\n"
+              // this.strcontent += "***** 开始安装 *****\n"
+            }
 
-          // 和当前step 一样
-          if(this.nowStep === recvdata.nowStep) {
-            this.strcontent += recvdata.installLogInfo // 更新字符串
-            // 字符串长度小于100000，防止渲染不了
-            if(this.strcontent.length > 100000)
-            {
-              this.strcontent = this.strcontent.substring(-100000);
-            }
-            // 重定位
-            nextTick(() => {
-              let sroll = document.getElementById('sroll');
-              sroll.scrollTop = sroll.scrollHeight
-              let sroll1 = document.getElementById('sroll1');
-              sroll1.scrollTop = sroll1.scrollHeight
-            })
-            // (1) 整体安装是否完毕?
-            if(recvdata.isEnd === true) {
-              // 等5s后再跳转,显示 安装完毕
-              this.sleep1(5000,()=>{
-                this.installProcess = 4 // 安装完毕
-                clearInterval(this.timeId); // 销毁定时器
-                // console.log('-1')
+            // 和当前step 一样
+            if(this.nowStep === recvdata.nowStep) {
+              this.strcontent += recvdata.installLogInfo // 更新字符串
+              // 字符串长度小于100000，防止渲染不了
+              if(this.strcontent.length > 100000)
+              {
+                this.strcontent = this.strcontent.substring(-100000);
+              }
+              // 重定位
+              nextTick(() => {
+                let sroll = document.getElementById('sroll');
+                sroll.scrollTop = sroll.scrollHeight
+                let sroll1 = document.getElementById('sroll1');
+                sroll1.scrollTop = sroll1.scrollHeight
               })
-            }
-            else {
-              // (2) 第step步是否安装完毕,显示安装下一步
-              if(recvdata.nowEnd === true) {
-                if(recvdata.nowSuccess === false) { // 重新安装当前这步
-                  this.installProcess = 3
+              // (1) 整体安装是否完毕?
+              if(recvdata.isEnd === true) {
+                hulue = true
+                // 等5s后再跳转,显示 安装完毕
+                this.sleep1(5000,()=>{
+                  this.isEnd = 1 // 安装完毕
+                  // 取消其他按钮
+                  this.installProcess = 2
+                  this.nowSuccess = 0
+                  clearInterval(this.timeId); // 销毁定时器
+                  // console.log('-1')
+                })
+              }
+              else {
+                // (2) 第step步是否安装完毕,显示安装下一步
+                if(recvdata.nowEnd === true) {
+                  hulue = true
+                  if(recvdata.nowSuccess === false) { // 重新安装当前这步
+                    this.nowSuccess = 2
+                    // 取消其他按钮
+                    this.installProcess = 2
+                    this.isEnd = 0
+                  }
+                  else {
+                    this.nowSuccess = 1 // 开启 下一步 按钮
+                    // 取消其他按钮
+                    this.installProcess = 2
+                    this.isEnd = 0
+                  }
+                  clearInterval(this.timeId); // 销毁定时器
+                  // console.log('-1')
                 }
-                else {
-                  this.installProcess = 2 // 开启 下一步 按钮
-                }
-                clearInterval(this.timeId); // 销毁定时器
-                // console.log('-1')
               }
             }
           }

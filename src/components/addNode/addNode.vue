@@ -217,7 +217,7 @@ export default {
         }
       }).then((res) => {
         let recvdata = res.data.data
-        if(recvdata.isValid === true) {
+        if(recvdata.isConnected === true) { 
           // 新增IPnode
           this.ipList.push({
             // time: nowTime.toGMTString(),
@@ -259,7 +259,7 @@ export default {
           }
         }).then((res) => {
           let recvdata = res.data.data
-          if(recvdata.isValid === true) {
+          if(recvdata.isConnected === true) {
             // 在列表中删除ip节点
             this.ipList.splice(index,1)
           }else{
@@ -340,8 +340,8 @@ export default {
       })
     },
     beforeNextStep (ret) {
-      // 1 判断是否有4个IP
-      if(this.validIP < 4) {
+      // 1 判断合法IP个数
+      if(this.connectIP < 4) {
         // alert('IP节点数量不足4个，请保证至少有4个IP节点')
         ElMessage({
           message: '合法IP节点数量不足4个，请保证至少有4个合法的IP节点',
@@ -375,10 +375,21 @@ export default {
     }
   },
   computed: {
+    // 合法IP
     validIP() {
       let ans = 0;
       for(let i=0;i<this.ipList.length;i++) {
         if(this.ipList[i].isConnected === true && this.ipList[i].isCpu === true && this.ipList[i].isMemory === true) {
+          ans += 1;
+        }
+      }
+      return ans;
+    },
+    // 连接成功的IP个数
+    connectIP() {
+      let ans = 0;
+      for(let i=0;i<this.ipList.length;i++) {
+        if(this.ipList[i].isConnected === true) {
           ans += 1;
         }
       }
