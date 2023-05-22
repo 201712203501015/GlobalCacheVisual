@@ -7,7 +7,7 @@
     <!-- 当前安装完的步骤 -->
     <div class="install-title">
       <div id="sroll1" class="infinite-list1" style="overflow: auto;">
-        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ item }}</p>
+        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ this.nowStep + ". " + item }}</p>
       </div>
     </div>
     <!-- 安装细节 -->
@@ -24,11 +24,11 @@
     </div>
     <div style="margin-top: 10px; align-items: center;justify-content: center;display: flex;">
       <!-- 开始按钮，点击这个按钮再开始安装 -->
-      <el-button v-if="installProcess===0" type="primary" @click="Start()">开始安装</el-button>
+      <el-button v-if="installProcess===0" type="primary" @click="Start(false)">开始安装</el-button>
       <!-- 下一步按钮 -->
-      <el-button v-if="installProcess===2" type="primary" @click="Start()">下一步</el-button>
+      <el-button v-if="installProcess===2" type="primary" @click="Start(true)">下一步</el-button>
       <!-- 重新安装 -->
-      <el-button v-if="installProcess===3" type="primary" @click="Start()">重新安装</el-button>
+      <el-button v-if="installProcess===3" type="primary" @click="Start(false)">重新安装</el-button>
       <!-- 安装中 -->
       <el-button v-if="installProcess===1" type="primary" disabled>安装中</el-button>
       <!-- 完成按钮 -->
@@ -138,9 +138,12 @@ export default {
         })
       }
     },
-    Start() {
+    Start(cl) {
       clearInterval(this.timeId);
       this.installProcess = 1; // 改变当前安装状态
+      if(cl === true) {
+        this.strcontent = "" // 清空数组
+      }
       // let nowEnd = false
       // if(this.installProcess === 2 || this.installProcess === 3) {
       //   nowEnd = true
