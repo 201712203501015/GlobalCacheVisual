@@ -6,7 +6,7 @@ import axios from '@/api/ajax.js'
 // 导入WebSocket
 // import SocketService from './api/socket_service' // 3-7 注释了这里
 //导入mock
-// import './mock/' // 打包或后端测试需要注释掉这里
+import './mock/' // 打包或后端测试需要注释掉这里
 
 // 引入element-ui
 import ElementPlus from 'element-plus'

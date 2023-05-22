@@ -153,7 +153,7 @@ export default {
           method: 'post',
           data: {
            token: this.store.state.userToken, 
-          //  nowStep: this.nowStep, // 当前是第几步
+           nowStep: this.nowStep, // 当前是第几步
           //  nowEnd: nowEnd, // 第几步是否结束
           }
         }).then((res) => {
@@ -163,9 +163,9 @@ export default {
             this.logInfoList.push(recvdata.nowName);
             this.nowStep = recvdata.nowStep; // 第几步(当前)
             // 更新显示内容
-            this.strcontent = "" // 清空数组
-            this.strcontent += "正在请求安装......\n"
-            this.strcontent += "***** 开始安装 *****\n"
+            // this.strcontent = "" // 清空数组
+            // this.strcontent += "正在请求安装......\n"
+            // this.strcontent += "***** 开始安装 *****\n"
             this.installProcess = 1; // 改变当前安装状态
           }
 
@@ -187,22 +187,24 @@ export default {
             // (1) 整体安装是否完毕?
             if(recvdata.isEnd === true) {
               // 等5s后再跳转,显示 安装完毕
-              // this.sleep1(1000,()=>{
+              this.sleep1(5000,()=>{
                 this.installProcess = 4 // 安装完毕
                 clearInterval(this.timeId); // 销毁定时器
                 // console.log('-1')
-              // })
+              })
             }
-            // (2) 第step步是否安装完毕,显示安装下一步
-            if(recvdata.nowEnd === true) {
-              if(recvdata.nowSuccess === false) { // 重新安装当前这步
-                this.installProcess = 3
+            else {
+              // (2) 第step步是否安装完毕,显示安装下一步
+              if(recvdata.nowEnd === true) {
+                if(recvdata.nowSuccess === false) { // 重新安装当前这步
+                  this.installProcess = 3
+                }
+                else {
+                  this.installProcess = 2 // 开启 下一步 按钮
+                }
+                clearInterval(this.timeId); // 销毁定时器
+                // console.log('-1')
               }
-              else {
-                this.installProcess = 2 // 开启 下一步 按钮
-              }
-              clearInterval(this.timeId); // 销毁定时器
-              // console.log('-1')
             }
           }
           
@@ -215,6 +217,7 @@ export default {
 
 <style>
 .install-com {
+  height: 80%;
   margin: 10px;
 }
 
@@ -226,7 +229,7 @@ export default {
 }
 
 .infinite-list {
-  height: 280px;
+  height: calc(100% - 20px);;
   width: 90%;
   word-break: break-all;
   word-wrap: break-word;
@@ -252,7 +255,8 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 10px;
-  height: 300px;
+  height: calc(100% - 20px);
+  max-height: 600px;
   width: calc(100% - 40px);
   border: 2px solid black;
   border-radius: 4px;
