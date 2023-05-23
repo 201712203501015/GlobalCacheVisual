@@ -156,8 +156,8 @@ export default {
           method: 'post',
           data: {
            token: this.store.state.userToken, 
-           nowStep: this.nowStep, // 当前是第几步
-           nowName: this.nowName
+           // nowStep: this.nowStep, // 当前是第几步
+           // nowName: this.nowName
           }
         }).then((res) => {
           let recvdata = res.data.data
@@ -191,6 +191,7 @@ export default {
             else {
               // (2) 第step步是否安装完毕,显示安装下一步
               if(recvdata.nowEnd === true) {
+                hu = true // 忽略后面内容
                 if(recvdata.nowSuccess === false) { // 重新安装当前这步
                   this.nowSuccess = 2
                   // 取消其他按钮
@@ -215,17 +216,22 @@ export default {
     Begin(cl) {
       if(this.onceClick===1) return ;
       this.onceClick = 1;// 无法立即重复点击
-      this.nowStep += 1;
+      // 切换到等待中的按钮
+      this.installProcess = 1
+      this.nowSuccess = 0
+      this.isEnd = 0
       if(cl === true) { // 下一步前要清屏
         this.strcontent = ""
       }
+      // 调用Start()
+      this.Start()
       API({
         url: '/getInstall',
         method: 'post',
         data: {
           token: this.store.state.userToken,
           nowStep: this.nowStep, // 当前步骤
-          nowName: this.nowName
+          // nowName: this.nowName
         }
       }).then((res) => {
         let recvdata = res.data.data
@@ -235,9 +241,17 @@ export default {
         this.nowSuccess = 0
         this.isEnd = 0
         // 2 更新步骤
-        this.logInfoList.push(recvdata.nowName);
-        // 3 调用Start()
-        this.Start()
+        let fg = false
+        for(let i=0;i<this.logInfoList.length;i++) {
+          if(this.logInfoList[i] === recvdata.nowName) {
+            fg = true
+            break
+          }
+        }
+        if(fg === false) { // 只有当不用重新安装才能添加步骤
+          this.nowStep += 1;
+          this.logInfoList.push(recvdata.nowName);
+        }
       })
     }
   },
