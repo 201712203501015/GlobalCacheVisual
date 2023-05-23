@@ -7,7 +7,7 @@
     <!-- 当前安装完的步骤 -->
     <div class="install-title">
       <div id="sroll1" class="infinite-list1" style="overflow: auto;">
-        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ this.nowStep + ". " + item }}</p>
+        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ (index+1).toString() + ". " + item }}</p>
       </div>
     </div>
     <!-- 安装细节 -->
@@ -66,6 +66,7 @@ export default {
       strcontent: "",
       // 第几步
       nowStep: 0,
+      nowName: null,
       // 第几步是否安装完毕,true状态下是禁用 下一步 按钮
       nowEnd: false,
       // 安装进程，0-安装未开始，1-安装中
@@ -74,6 +75,8 @@ export default {
       nowSuccess: 0,
       // 安装完毕 标志，0-未完成，1-安装完毕
       isEnd: 0,
+      // 鼠标只点一次
+      onceClick: 0,
     }
   },
   mounted() {
@@ -154,6 +157,7 @@ export default {
           data: {
            token: this.store.state.userToken, 
            nowStep: this.nowStep, // 当前是第几步
+           nowName: this.nowName
           }
         }).then((res) => {
           let recvdata = res.data.data
@@ -180,6 +184,7 @@ export default {
                 // 取消其他按钮
                 this.installProcess = 2
                 this.nowSuccess = 0
+                this.onceClick = 0; // 鼠标可以再次点击
                 clearInterval(this.timeId); // 销毁定时器
               })
             }
@@ -198,6 +203,7 @@ export default {
                   this.installProcess = 2
                   this.isEnd = 0
                 }
+                this.onceClick = 0; // 鼠标可以再次点击
                 clearInterval(this.timeId); // 销毁定时器
               }
             }
@@ -207,29 +213,32 @@ export default {
     },
     // 用户点击调用
     Begin(cl) {
+      if(this.onceClick===1) return ;
+      this.onceClick = 1;// 无法立即重复点击
       this.nowStep += 1;
       if(cl === true) { // 下一步前要清屏
         this.strcontent = ""
       }
       API({
-          url: '/getInstall',
-          method: 'post',
-          data: {
-           token: this.store.state.userToken,
-           nowStep: this.nowStep, // 当前步骤
-          }
-        }).then((res) => {
-          let recvdata = res.data.data
-          // 1 切换按钮
-          this.installProcess = 1
-          // 取消其他按钮
-          this.nowSuccess = 0
-          this.isEnd = 0
-          // 2 更新步骤
-          this.logInfoList.push(recvdata.nowName);
-          // 3 调用Start()
-          this.Start()
-        })
+        url: '/getInstall',
+        method: 'post',
+        data: {
+          token: this.store.state.userToken,
+          nowStep: this.nowStep, // 当前步骤
+          nowName: this.nowName
+        }
+      }).then((res) => {
+        let recvdata = res.data.data
+        // 1 切换按钮
+        this.installProcess = 1
+        // 取消其他按钮
+        this.nowSuccess = 0
+        this.isEnd = 0
+        // 2 更新步骤
+        this.logInfoList.push(recvdata.nowName);
+        // 3 调用Start()
+        this.Start()
+      })
     }
   },
 }
