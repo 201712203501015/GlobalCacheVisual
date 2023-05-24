@@ -65,7 +65,7 @@ export default {
       // 字符串信息
       strcontent: "",
       // 第几步
-      nowStep: 0,
+      nowStep: 1,
       nowName: null,
       // 第几步是否安装完毕,true状态下是禁用 下一步 按钮
       nowEnd: false,
@@ -230,7 +230,7 @@ export default {
         method: 'post',
         data: {
           token: this.store.state.userToken,
-          nowStep: (this.nowStep === 0 ? 1:this.nowStep), // 当前步骤
+          nowStep: this.nowStep, // 当前步骤
           // nowName: this.nowName
         }
       }).then((res) => {
