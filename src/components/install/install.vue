@@ -7,7 +7,7 @@
     <!-- 当前安装完的步骤 -->
     <div class="install-title">
       <div id="sroll1" class="infinite-list1" style="overflow: auto;">
-        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ (index+1).toString() + ". " + item }}</p>
+        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ (index).toString() + ". " + item }}</p>
       </div>
     </div>
     <!-- 安装细节 -->
@@ -24,14 +24,14 @@
     </div>
     <div style="margin-top: 10px; align-items: center;justify-content: center;display: flex;">
       <!-- 开始按钮，点击这个按钮再开始安装 -->
-      <el-button v-if="installProcess===0" type="primary" @click="Begin(false)">开始安装</el-button>
+      <el-button v-if="installProcess===0" type="primary" @click="Begin(false,1)">开始安装</el-button>
       <!-- 安装中 -->
       <el-button v-if="installProcess===1" type="primary" disabled>安装中</el-button>
 
       <!-- 下一步按钮 -->
-      <el-button v-if="nowSuccess===1" type="primary" @click="Begin(true)">下一步</el-button>
+      <el-button v-if="nowSuccess===1" type="primary" @click="Begin(true,0)">下一步</el-button>
       <!-- 重新安装 -->
-      <el-button v-if="nowSuccess===2" type="primary" @click="Begin(false)">重新安装</el-button>
+      <el-button v-if="nowSuccess===2" type="primary" @click="Begin(false,0)">重新安装</el-button>
       
       <!-- 完成按钮 -->
       <el-button v-if="isEnd===1" type="primary" @click="goto('userView')">完成</el-button>
@@ -213,7 +213,7 @@ export default {
       },1000)
     },
     // 用户点击调用
-    Begin(cl) {
+    Begin(cl,bj) {
       if(this.onceClick===1) return ;
       this.onceClick = 1;// 无法立即重复点击
       // 切换到等待中的按钮
@@ -222,6 +222,9 @@ export default {
       this.isEnd = 0
       if(cl === true) { // 下一步前要清屏
         this.strcontent = ""
+      }
+      if(bj === 1) { // 一开始安装时，显示这条命令
+        this.logInfoList.push('生成集群部署配置文件')
       }
       // 调用Start()
       this.Start()
