@@ -259,7 +259,7 @@ export default {
           }
         }).then((res) => {
           let recvdata = res.data.data
-          if(recvdata.isConnected === true) {
+          if(recvdata.isValid === true) {
             // 在列表中删除ip节点
             this.ipList.splice(index,1)
           }else{
