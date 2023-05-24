@@ -413,7 +413,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
     data:{
       ipList:[
         {
-          name: '192.156.23.3',
+          remoteIPv4: '192.156.23.3',
           isConnected: true, // 能否连接
           isCpu: false, // CPU是否满足要求
           isMemory: false, // 内存是否满足要求
@@ -425,7 +425,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           // getIPSet
           localIPv4: '192.156.23.3',
           clusterIPv4: '192.156.23.3',
-          remoteIPv4: '192.156.23.3',
+          publicIPv4: '192.156.23.3',
           // getDiskClassification
           dataDisk:[ // Data盘列表
               {
@@ -517,7 +517,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           ], // Cache盘列表
         },
         {
-          name: '192.22.34.2',
+          remoteIPv4: '192.22.34.2',
           isConnected: false, // 能否连接
           isCpu: true, // CPU是否满足要求
           isMemory: false, // 内存是否满足要求
@@ -536,7 +536,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           cacheList: [],
         },
         {
-          name: '192.56.33.2',
+          remoteIPv4: '192.56.33.2',
           isConnected: true, // 能否连接
           isCpu: true, // CPU是否满足要求
           isMemory: true, // 内存是否满足要求
@@ -548,7 +548,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           // getIPSet
           localIPv4: '192.56.33.2',
           clusterIPv4: '192.56.33.2',
-          remoteIPv4: '192.56.33.2',
+          publicIPv4: '192.56.33.2',
           // getDiskClassification
           dataDisk:[ // Data盘列表
               {
@@ -640,7 +640,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           ], // Cache盘列表
         },
         {
-          name: '192.56.37.8',
+          remoteIPv4: '192.56.37.8',
           isConnected: true, // 能否连接
           isCpu: true, // CPU是否满足要求
           isMemory: true, // 内存是否满足要求
@@ -652,7 +652,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           // getIPSet
           localIPv4: '192.56.37.8',
           clusterIPv4: '192.56.37.8',
-          remoteIPv4: '192.56.37.8',
+          publicIPv4: '192.56.37.8',
           // getDiskClassification
           dataDisk:[ // Data盘列表
               {
@@ -744,7 +744,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           ], // Cache盘列表
         },
         {
-          name: '192.56.39.8',
+          remoteIPv4: '192.56.39.8',
           isConnected: true, // 能否连接
           isCpu: true, // CPU是否满足要求
           isMemory: true, // 内存是否满足要求
@@ -756,7 +756,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           // getIPSet
           localIPv4: '192.56.39.8',
           clusterIPv4: '192.56.39.8',
-          remoteIPv4: '192.56.39.8',
+          publicIPv4: '192.56.39.8',
           // getDiskClassification
           dataDisk:[ // Data盘列表
               {
@@ -848,7 +848,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           ], // Cache盘列表
         },
         {
-          name: '192.77.37.8',
+          remoteIPv4: '192.77.37.8',
           isConnected: true, // 能否连接
           isCpu: true, // CPU是否满足要求
           isMemory: true, // 内存是否满足要求
@@ -860,7 +860,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
           // getIPSet
           localIPv4: '192.77.37.8',
           clusterIPv4: '192.77.37.8',
-          remoteIPv4: '192.77.37.8',
+          publicIPv4: '192.77.37.8',
           // getDiskClassification
           dataDisk:[ // Data盘列表
               {

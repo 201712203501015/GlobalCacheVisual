@@ -76,7 +76,7 @@
                 <!-- IP名称列 -->
                 <el-table-column label="IP">
                   <template #default="scope">
-                    <el-tag>{{ scope.row.name }}</el-tag>
+                    <el-tag>{{ scope.row.remoteIPv4 }}</el-tag>
                   </template>
                 </el-table-column>
                 <!-- IP角色列 -->
@@ -196,7 +196,7 @@ export default {
       + Number(this.ipNum4).toString()
       let fg = true
       for(let i=0;i<this.ipList.length;i++) {
-        if(ss === this.ipList[i].name){
+        if(ss === this.ipList[i].remoteIPv4){
           fg = false
           break
         }
@@ -221,7 +221,7 @@ export default {
           // 新增IPnode
           this.ipList.push({
             // time: nowTime.toGMTString(),
-            name: ss,
+            remoteIPv4: ss,
             isConnected: recvdata.isConnected,
             isCpu: recvdata.isCpu,
             isMemory: recvdata.isMemory,
@@ -254,7 +254,7 @@ export default {
           url: '/getDeleteIP',
           method: 'post',
           data: {
-            ipAddress: this.ipList[index].name,
+            ipAddress: this.ipList[index].remoteIPv4,
             token: this.store.state.userToken
           }
         }).then((res) => {
@@ -264,7 +264,7 @@ export default {
             this.ipList.splice(index,1)
           }else{
             // alert('IP: ' + this.ipList[index].name + '无法被删除')
-            ElMessage.error('IP: ' + this.ipList[index].name + '无法被删除')
+            ElMessage.error('IP: ' + this.ipList[index].remoteIPv4 + '无法被删除')
           }
           this.loadingDelet = false
         }).catch(err => {

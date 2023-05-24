@@ -14,7 +14,7 @@
               <span>节点IP</span>
           </template>
           <template #default="scope">
-            <el-tag>{{ scope.row.name }}</el-tag>
+            <el-tag>{{ scope.row.remoteIPv4 }}</el-tag>
           </template>
         </el-table-column>
         <!-- 节点名称 -->
@@ -203,7 +203,7 @@ export default {
           
           this.ipList.push({
             id: jt,
-            name: tpipList[i].name,
+            remoteIPv4: tpipList[i].remoteIPv4,
             roleName: tpipList[i].roleName,
             cephChoice: cephChoice, // new
             diskNum: diskNum,// 最后一位
@@ -259,7 +259,7 @@ export default {
         // console.log('dataList = ',dataList); // 检测完毕，设置成功
         // console.log('cacheList = ',cacheList); // 检测完毕，设置成功
         ipList.push({
-          name: this.ipList[i].name,
+          remoteIPv4: this.ipList[i].remoteIPv4,
           roleName: this.ipList[i].roleName,
           dataList: dataList,
           cacheList: cacheList,

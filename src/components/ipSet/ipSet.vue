@@ -17,7 +17,7 @@
               <span>节点IP</span>
           </template>
           <template #default="scope">
-            <el-tag>{{ scope.row.name }}</el-tag>
+            <el-tag>{{ scope.row.remoteIPv4 }}</el-tag>
           </template>
         </el-table-column>
         <!-- 节点名称 -->
@@ -55,14 +55,14 @@
           <template #default="scope">
             <!-- <el-tag>{{ scope.row.localIPv4 }}</el-tag> -->
             <el-input 
-              v-model="this.ipList[ scope.row.id ].pubIPv4" 
+              v-model="this.ipList[ scope.row.id ].publicIPv4" 
               :disabled="this.ipList[ scope.row.id ].pubIPv4State === 0 ? true: false"
               style="width: 200px;"
               ></el-input>
             &nbsp;
-            <el-tag @click="changeState('pubIPv4',1,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 1}">edit</el-tag>
+            <el-tag @click="changeState('publicIPv4',1,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 1}">edit</el-tag>
             &nbsp;
-            <el-tag @click="changeState('pubIPv4',0,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 0}">set</el-tag>
+            <el-tag @click="changeState('publicIPv4',0,scope.row.id)" :class="{'button-select':this.ipList[ scope.row.id ].pubIPv4State === 0}">set</el-tag>
           </template>
         </el-table-column>
         <!-- Cluster IPv4 -->
@@ -133,11 +133,11 @@ export default {
         if(tpipList[i].ceph === true || tpipList[i].ceph1 === true) { // 筛选ceph节点
           this.ipList.push({
             id: j,
-            name: tpipList[i].name,
+            remoteIPv4: tpipList[i].remoteIPv4,
             roleName: tpipList[i].roleName,
             localIPv4: tpipList[i].localIPv4,
             clusterIPv4: tpipList[i].clusterIPv4,
-            pubIPv4: tpipList[i].remoteIPv4,
+            publicIPv4: tpipList[i].publicIPv4,
             localIPv4State: 0, // 0表示不能更改，1表示可以更改
             clusterIPv4State: 0,
             pubIPv4State: 0,
@@ -166,17 +166,17 @@ export default {
         if(this.ipList[i].localIPv4State === 1 || this.ipList[i].clusterIPv4State === 1 || this.ipList[i].pubIPv4State === 1) {
           fg = false
         }
-        if(clusterIPv4.has(this.ipList[i].clusterIPv4) === true || localIPv4.has(this.ipList[i].localIPv4) === true || pubIPv4.has(this.ipList[i].pubIPv4)){
+        if(clusterIPv4.has(this.ipList[i].clusterIPv4) === true || localIPv4.has(this.ipList[i].localIPv4) === true || pubIPv4.has(this.ipList[i].publicIPv4)){
           fg = false
         }
         localIPv4.add(this.ipList[i].localIPv4)
         clusterIPv4.add(this.ipList[i].clusterIPv4)
-        pubIPv4.add(this.ipList[i].pubIPv4)
+        pubIPv4.add(this.ipList[i].publicIPv4)
       }
       if(fg === false){
         // alert('请确保每个ip都set了')
         ElMessage({
-          message: '请确保每个ip都set了，并且clusterIPv4，pubIPv4和localIPv4都不一样',
+          message: '请确保每个ip都set了，并且clusterIPv4，publicIPv4和localIPv4都不一样',
           type: 'warning',
         })
         return ;
@@ -185,11 +185,11 @@ export default {
       let ipList = []
       for(let i=0;i<this.ipList.length;i++) {
         ipList.push({
-          name: this.ipList[i].name,
+          remoteIPv4: this.ipList[i].remoteIPv4,
           roleName: this.ipList[i].roleName,
           localIPv4: this.ipList[i].localIPv4,
           clusterIPv4: this.ipList[i].clusterIPv4,
-          remoteIPv4: this.ipList[i].pubIPv4
+          publicIPv4: this.ipList[i].publicIPv4
         })
       }
       // console.log('收到数据ipList = ',ipList);
@@ -301,11 +301,11 @@ export default {
         }else{
           this.ipList[id].clusterIPv4State = 1
         }
-      }else if(name === 'pubIPv4') {
+      }else if(name === 'publicIPv4') {
         // 修改clusterIPv4
         if(state === 0) {
           // 检验是否合格
-          if(this.isValidIP(this.ipList[id].pubIPv4) === true) {
+          if(this.isValidIP(this.ipList[id].publicIPv4) === true) {
             this.ipList[id].pubIPv4State = 0
           }else{
             // alert('输入的ip不合法，请重新输入')
