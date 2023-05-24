@@ -230,7 +230,7 @@ export default {
         method: 'post',
         data: {
           token: this.store.state.userToken,
-          nowStep: this.nowStep, // 当前步骤
+          nowStep: (this.nowStep === 0 ? 1:this.nowStep), // 当前步骤
           // nowName: this.nowName
         }
       }).then((res) => {

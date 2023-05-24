@@ -1093,7 +1093,7 @@ Mock.mock('http://localhost:8899/getAffirmSet','post',(req) => {
       // 2 ceph1 信息
       ceph1: [
         {
-          name: '192.168.10.7',
+          remoteIPv4: '192.168.10.7',
           dataList: [
               {
                   "id": 0,
@@ -1148,7 +1148,7 @@ Mock.mock('http://localhost:8899/getAffirmSet','post',(req) => {
       // 3 其他ceph信息
       ceph:[
         {
-          name: '192.56.33.2',
+          remoteIPv4: '192.56.33.2',
           roleName: 'ceph2',
           localIPv4: '192.56.33.2',
           clusterIPv4: '192.56.33.2',
@@ -1191,7 +1191,7 @@ Mock.mock('http://localhost:8899/getAffirmSet','post',(req) => {
       // 4 client信息
       client:[
         {
-          name: '192.22.34.2',
+          remoteIPv4: '192.22.34.2',
           roleName: 'client1',
         }
       ]

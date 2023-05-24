@@ -50,7 +50,7 @@
           </tr>
           <tr>
             <td>节点ip： </td>
-            <td>{{ this.ceph1.name }}</td>
+            <td>{{ this.ceph1.remoteIPv4 }}</td>
           </tr>
           <tr>
             <td>Data盘： </td>
@@ -65,7 +65,7 @@
             <td>
               <b>client节点:</b>
             </td>
-            <td>{{ this.getNameToString(this.client) }}</td>
+            <td>{{ this.getremoteIPv4ToString(this.client) }}</td>
           </tr>
         </table>
       </el-col>
@@ -99,7 +99,7 @@
                       <span>节点IP</span>
                   </template>
                   <template #default="scope">
-                    <el-tag>{{ scope.row.name }}</el-tag>
+                    <el-tag>{{ scope.row.remoteIPv4 }}</el-tag>
                   </template>
                 </el-table-column>
                 <!-- Local IP -->
@@ -208,7 +208,7 @@ export default {
       this.ptNum = recvdata.ptNum
       this.pgNum = recvdata.pgNum
       // 2 更新ceph1信息
-      this.ceph1.name = recvdata.ceph1[0].name,
+      this.ceph1.remoteIPv4 = recvdata.ceph1[0].remoteIPv4,
       this.ceph1.dataList = recvdata.ceph1[0].dataList
       this.ceph1.cacheList = recvdata.ceph1[0].cacheList
       // 3 更新其他ceph信息
@@ -249,6 +249,15 @@ export default {
       }
       return ans;
     },
+    // 提取出remoteIPv4属性,并转化为string类型
+    getremoteIPv4ToString(arr) {
+      let ans = ""
+      for(let i=0;i<arr.length;i++) {
+        if(i > 0) ans += ","
+        ans += arr[i].remoteIPv4
+      }
+      return ans;
+    }
   }
 }
 </script>

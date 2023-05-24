@@ -88,19 +88,19 @@
                 <!-- 能否连接 -->
                 <el-table-column label="能否连接">
                   <template #default="scope">
-                    <el-tag>{{ scope.row.isConnected === true ? "是":"否" }}</el-tag>
+                    <el-tag :class="scope.row.isConnected === true ? 'blue-tag':'red-tag' ">{{ scope.row.isConnected === true ? "是":"否" }}</el-tag>
                   </template>
                 </el-table-column>
                 <!-- CPU是否满足要求 -->
                 <el-table-column label="CPU是否满足要求">
                   <template #default="scope">
-                    <el-tag>{{ scope.row.isCpu === true ? "是":"否" }}</el-tag>
+                    <el-tag :class="scope.row.isCpu === true ? 'blue-tag':'red-tag' ">{{ scope.row.isCpu === true ? "是":"否" }}</el-tag>
                   </template>
                 </el-table-column>
                 <!-- 内存是否满足要求 -->
                 <el-table-column label="内存是否满足要求">
                   <template #default="scope">
-                    <el-tag>{{ scope.row.isMemory === true ? "是":"否" }}</el-tag>
+                    <el-tag :class="scope.row.isMemory === true ? 'blue-tag':'red-tag' ">{{ scope.row.isMemory === true ? "是":"否" }}</el-tag>
                   </template>
                 </el-table-column>
                 <!-- 操作列 -->
