@@ -43,6 +43,7 @@
 import { nextTick } from 'vue'
 import { useStore } from 'vuex'
 import API from '@/api/ajax.js'; // 引入API
+import APIInstall from '@/api/ajaxInstall.js'; // 引入API
 import { ElMessageBox } from 'element-plus'
 export default {
   setup(){
