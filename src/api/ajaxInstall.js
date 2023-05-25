@@ -4,15 +4,14 @@ import axios from 'axios'
 import { getToken } from '@/utils/auth'
 import { AJAX_PORT,AJAX_IP } from '@/api/port.js'
 
-//使用axios下面的create([config])方法创建axios实例，其中config参数为axios最基本的配置信息。
-const API = axios.create({
+// getInstall的API接口，超时时间2h
+const APIInstall = axios.create({
 	baseURL: AJAX_IP+AJAX_PORT, //请求后端数据的基本地址，自定义8888
-	timeout: 200000                   //请求超时设置，单位ms
+	timeout: 7200000                   //请求超时设置，单位ms
 })
 
-// API.defaults.withCredentials = true
 // 添加拦截器
-API.interceptors.request.use(config => {
+APIInstall.interceptors.request.use(config => {
 	let token = getToken()
 	// console.log('token ==== ',token)
 	if(token != null && token != undefined) {
@@ -26,4 +25,4 @@ API.interceptors.request.use(config => {
 	return Promise.reject(error)
 })
 
-export default API
+export default APIInstall

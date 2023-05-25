@@ -228,7 +228,7 @@ export default {
       }
       // 调用Start()
       this.Start()
-      API({
+      APIInstall({
         url: '/getInstall',
         method: 'post',
         data: {
