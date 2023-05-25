@@ -7,7 +7,7 @@
     <!-- 当前安装完的步骤 -->
     <div class="install-title">
       <div id="sroll1" class="infinite-list1" style="overflow: auto;">
-        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ (index).toString() + ". " + item }}</p>
+        <p class="text-wrapper" v-for="(item,index) in logInfoList" :key="index" style="height: 20px;">{{ (index+1).toString() + ". " + item }}</p>
       </div>
     </div>
     <!-- 安装细节 -->
