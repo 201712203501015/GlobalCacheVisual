@@ -156,21 +156,17 @@ export default {
       // 连接成功
       // console.log("NodeNet WebSocket连接成功");
       // 连接成功后直接发送数据
-      this.wsNodeNet.send(
-        JSON.stringify({
-          url: "/getNetData",
-          params: {
-            token: this.store.state.userToken,
-            nodeId: this.store.state.nowNodeId, // nodeId
-          },
-          // action: 'getNetData',
-          // socketType: 'getNetData',
-          // data: {
-          //   // nodeId: 0
-          //   nodeId: this.store.state.nowNodeId, // nodeId
-          // }
-        })
-      );
+      if(this.wsNodeNet.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
+        this.wsNodeNet.send(
+          JSON.stringify({
+            url: "/getNetData",
+            params: {
+              token: this.store.state.userToken,
+              nodeId: this.store.state.nowNodeId, // nodeId
+            },
+          })
+        );
+      }
     },
     websocketonerror() {
       // 连接失败

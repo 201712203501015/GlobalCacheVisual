@@ -231,7 +231,6 @@
           if(this.store.state.nowNodeType == null) {
               this.store.commit('changeNodeType', 'cpu')
           }
-          
           // 更新vuex中newNodeHealth
           this.store.commit('changeNodeHealth', this.nodeList.nodeState[id])
           // 更新vuex中nowHealthState
@@ -308,12 +307,14 @@
       websocketonopen() { // 连接成功
         //   console.log("NodeList WebSocket连接成功")
           // 连接成功后直接发送数据
-          this.wsNodeList.send(JSON.stringify({
+          if(this.wsNodeList.readyState === 1) {
+            this.wsNodeList.send(JSON.stringify({
               url: '/getCpuCalender',
               params: {
                 token: this.store.state.userToken
               }
-          }))
+            }))
+          }
       },
       websocketonerror() { // 连接失败
         //   console.log("NodeList WebSocket连接失败")

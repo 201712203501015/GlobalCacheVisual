@@ -206,21 +206,17 @@ export default {
       // 连接成功
       // console.log("NodeDisk WebSocket连接成功");
       // 连接成功后直接发送数据
-      this.wsNodeDisk.send(
-        JSON.stringify({
-          url: "/getDiskData",
-          params: {
-            token: this.store.state.userToken,
-            nodeId: this.store.state.nowNodeId,
-          },
-          // action: 'getDiskData',
-          // socketType: 'getDiskData',
-          // data: {
-          //   // nodeId: 0
-          //   nodeId: this.store.state.nowNodeId, // nodeId
-          // }
-        })
-      );
+      if(this.wsNodeDisk.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
+        this.wsNodeDisk.send(
+          JSON.stringify({
+            url: "/getDiskData",
+            params: {
+              token: this.store.state.userToken,
+              nodeId: this.store.state.nowNodeId,
+            },
+          })
+        );
+      }
     },
     websocketonerror() {
       // 连接失败

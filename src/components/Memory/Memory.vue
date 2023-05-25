@@ -112,19 +112,15 @@ export default {
     websocketonopen() { // 连接成功
       // console.log("NodeMemory WebSocket连接成功")
       // 连接成功后直接发送数据
-      this.wsNodeMemory.send(JSON.stringify({
-        url: '/getMemoryData',
-        params: {
-          token: this.store.state.userToken,
-          nodeId: this.store.state.nowNodeId, // nodeId
-        }
-        // action: 'getMemoryData',
-        // socketType: 'getMemoryData',
-        // data: {
-        //   // nodeId: 0
-        //   nodeId: this.store.state.nowNodeId, // nodeId
-        // }
-      }))
+      if(this.wsNodeMemory.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
+        this.wsNodeMemory.send(JSON.stringify({
+          url: '/getMemoryData',
+          params: {
+            token: this.store.state.userToken,
+            nodeId: this.store.state.nowNodeId, // nodeId
+          }
+        }))
+      }
     },
     websocketonerror() { // 连接失败
       // console.log("NodeMemory WebSocket连接失败")

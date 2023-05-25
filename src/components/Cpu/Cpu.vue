@@ -77,6 +77,8 @@ export default {
     this.initNodeCpu();
   },
   mounted() {
+    // 建立长连接
+    this.initNodeCpu();
     // 初始化图表
     this.initChart();
     // 建立监听
@@ -114,20 +116,18 @@ export default {
       // 连接成功
       // console.log("NodeCpu WebSocket连接成功");
       // 连接成功后直接发送数据
-      this.wsNodeCpu.send(
-        JSON.stringify({
-          url: "/getCpuData",
-          params: {
-            token: this.store.state.userToken, // token
-            nodeId: this.store.state.nowNodeId, // nodeId
-          },
-          // action: 'getCpuData',
-          // socketType: 'getCpuData',
-          // data: {
-          //   nodeId: this.store.state.nowNodeId, // nodeId
-          // }
-        })
-      );
+      // console.log('nowNodeId, readyState = ',this.store.state.nowNodeId,this.wsNodeCpu.readyState)
+      if(this.wsNodeCpu.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
+        this.wsNodeCpu.send(
+          JSON.stringify({
+            url: "/getCpuData",
+            params: {
+              token: this.store.state.userToken, // token
+              nodeId: this.store.state.nowNodeId, // nodeId
+            },
+          })
+        );
+      }
     },
     websocketonerror() {
       // 连接失败
