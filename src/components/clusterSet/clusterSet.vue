@@ -232,11 +232,10 @@ export default {
         this.pgNum = recvdata.pgNum
       })
       // .catch(err => {
-        // 输出错误信息
-        // console.log(err.message)
-        // ElMessageBox.alert('请求失败', '警告', {
-        //   confirmButtonText: 'OK'
-        // })
+      //   ElMessage({
+      //     message: '网络连接错误，集群设置信息获取失败',
+      //     type: 'warning',
+      //   })
       // })
     },
     // 判断IP是否合法
@@ -306,9 +305,9 @@ export default {
         this.nextStep(ret)
       }).catch(err => {
         // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
+        ElMessage({
+          message: '网络连接错误，集群设置提交失败，请重新提交',
+          type: 'warning',
         })
         // 结束变为false
         this.loading = false

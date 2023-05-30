@@ -50,7 +50,7 @@
   import { useStore } from 'vuex'
   import { defineAsyncComponent } from "vue"
   import { IP,WEBSOCKET_PORT } from '@/api/port.js'
-  import { ElMessageBox } from 'element-plus'
+  import { ElMessage,ElMessageBox } from 'element-plus'
   export default {
     setup () {
       // 创建store对象
@@ -317,9 +317,9 @@
           }
       },
       websocketonerror() { // 连接失败
-        //   console.log("NodeList WebSocket连接失败")
-        ElMessageBox.alert('连接失败', '警告', {
-          confirmButtonText: 'OK'
+        ElMessage({
+          message: '网络连接失败，CPU列表获取失败',
+          type: 'warning',
         })
       },
       websocketonmessage(ret) { // 数据接收

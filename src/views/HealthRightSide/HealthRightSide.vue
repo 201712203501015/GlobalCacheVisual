@@ -51,7 +51,7 @@
 
 <script>
 import { useStore } from 'vuex'
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox,ElMessage } from 'element-plus'
 import API from '@/api/ajax.js'; // 引入API
 export default {
   setup () {
@@ -108,9 +108,9 @@ export default {
         this.loading = false
       }).catch(err => {
         // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
+        ElMessage({
+          message: '网络连接失败，健康列表获取失败',
+          type: 'warning',
         })
         // 5 不转圈圈
         this.loading = false
