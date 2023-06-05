@@ -180,7 +180,7 @@ export default {
             if(recvdata.isEnd === true) {
               hu = true // 忽略后面内容
               // 等5s后再跳转,显示 安装完毕
-              this.sleep1(5000,()=>{
+              this.sleep1(1000*60,()=>{
                 this.isEnd = 1 // 安装完毕
                 // 取消其他按钮
                 this.installProcess = 2
