@@ -216,10 +216,9 @@ export default {
       // 4 更新client信息
       this.client = recvdata.client
     }).catch(err => {
-      // 输出错误信息
-      // console.log(err.message)
-      ElMessageBox.alert('请求失败', '警告', {
-        confirmButtonText: 'OK'
+      ElMessage({
+        message: '网络连接错误，确认信息获取失败',
+        type: 'warning',
       })
     })
   },

@@ -238,9 +238,9 @@ export default {
         this.loadingAddIP = false
       }).catch(err => {
         // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
+        ElMessage({
+          message: '网络连接错误，' + ss + '节点添加失败',
+          type: 'warning',
         })
         this.loadingAddIP = false
       })
@@ -269,9 +269,9 @@ export default {
           this.loadingDelet = false
         }).catch(err => {
           // 输出错误信息
-          // console.log(err.message)
-          ElMessageBox.alert('请求失败', '警告', {
-            confirmButtonText: 'OK'
+          ElMessage({
+            message: '网络连接错误，节点删除失败',
+            type: 'warning',
           })
           this.loadingDelet = false
         })
@@ -292,9 +292,9 @@ export default {
         this.loadingTable = false
       }).catch(err => {
         // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
+        ElMessage({
+          message: '网络连接失败，IP列表获取失败',
+          type: 'warning',
         })
         this.loadingTable = false
       })
@@ -332,9 +332,9 @@ export default {
         this.loadingSubmit = false
       }).catch(err => {
         // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
+        ElMessage({
+          message: '网络连接错误，root密码提交失败，请重新提交',
+          type: 'warning',
         })
         this.loadingSubmit = false
       })

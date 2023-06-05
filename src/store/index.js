@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import { ElMessage } from 'element-plus'
 
 export default createStore({
   // 存储组件会用到的数据
@@ -130,7 +131,10 @@ export default createStore({
           const { data } = res
           // console.log('res == ',res)
           if(data.vaild === false) { // 用户不合法
-            alert('用户登录失败，' + data.reason)
+            ElMessage({
+              message: '用户名或密码不合法',
+              type: 'warning',
+            })
             reject('登录失败')
           }
           // console.log('登陆成功,token = ',data.data.token)
@@ -138,7 +142,10 @@ export default createStore({
           setToken(data.data.token)
           resolve()
         }).catch(error => {
-          alert('登录失败，请重新登录')
+          ElMessage({
+            message: '网络连接错误，登陆失败',
+            type: 'warning',
+          })
           reject(error)
         })
       })
@@ -154,6 +161,10 @@ export default createStore({
           // console.log('getInfo = **',data.data)
   
           if(!data) {
+            ElMessage({
+              message: '验证失败，请重新登陆',
+              type: 'warning',
+            })
             return reject('Verification failed, please Login again')
           }
   
@@ -166,6 +177,10 @@ export default createStore({
           commit('changeIsFinished',data.data.isFinished)
           resolve(data)
         }).catch(error => {
+          ElMessage({
+            message: '网络连接错误，获取用户信息失败',
+            type: 'warning',
+          })
           reject(error)
         })
       })
@@ -179,6 +194,10 @@ export default createStore({
           commit('resetState')
           resolve()
         }).catch(error => {
+          ElMessage({
+            message: '网络连接失败，登出失败',
+            type: 'warning',
+          })
           reject(error)
         })
       })

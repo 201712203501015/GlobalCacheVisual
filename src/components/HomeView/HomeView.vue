@@ -198,9 +198,9 @@ export default {
         }
       }).catch(err => {
         // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
+        ElMessage({
+          message: '网络连接失败，健康信息获取失败',
+          type: 'warning',
         })
       })
     },
@@ -213,12 +213,6 @@ export default {
         }
         // this.$router.push({path:'/loginView'})
         this.$router.push(`/loginView?redirect=${this.$route.fullPath}`).catch(err=>err)
-      }).catch(err => {
-        // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
-        })
       })
     }
   },

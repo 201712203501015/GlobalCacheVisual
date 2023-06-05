@@ -42,7 +42,7 @@
 import { useStore } from 'vuex'
 import { markRaw } from '@vue/reactivity';
 import { IP,WEBSOCKET_PORT } from '@/api/port.js'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage,ElMessageBox } from 'element-plus'
 export default {
   setup () {
     // 创建store对象
@@ -123,9 +123,9 @@ export default {
       }
     },
     websocketonerror() { // 连接失败
-      // console.log("NodeMemory WebSocket连接失败")
-      ElMessageBox.alert('连接失败', '警告', {
-        confirmButtonText: 'OK'
+      ElMessage({
+        message: '网络连接失败，内存信息获取失败',
+        type: 'warning',
       })
     },
     websocketonmessage(ret) { // 数据接收

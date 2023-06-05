@@ -82,7 +82,7 @@ Mock.mock('http://localhost:8899/getRegister','post',(req) => {
 // 登出
 Mock.mock('http://localhost:8899/getLogOut','post',(req) => {
   let token = JSON.parse(req.body)
-  console.log('）））））））））））））））登出成功 = ',req)
+  // console.log('）））））））））））））））登出成功 = ',req)
 })
 
 // 修改密码
@@ -1010,28 +1010,6 @@ Mock.mock('http://localhost:8899/getCheckRootPassword','post',(req) => {
   return {
     data:{
       isRight: false
-    }
-  }
-})
-
-// getHardwareDetect
-Mock.mock('http://localhost:8899/getHardwareDetect','post',(req) => {
-  let ipName = JSON.parse(req.body).ipAddress
-  return {
-    data:{
-      name: ipName,
-      isConnected: true, // 能否连接
-      isCpu: true, // CPU是否满足要求
-      isMemory: true // 内存是否满足要求
-    }
-  }
-})
-
-// getRoleSet
-Mock.mock('http://localhost:8899/getRoleSet','post',(req) => {
-  return {
-    data:{
-      isSuccessed: true // 返回接收状态
     }
   }
 })

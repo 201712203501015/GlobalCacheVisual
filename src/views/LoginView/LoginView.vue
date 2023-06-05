@@ -125,13 +125,8 @@ export default {
         password: this.userPassword
       }).then(() => {
         this.$router.push({name: 'userView'}).catch(err=>err) // 跳转到用户信息界面
-      }).catch(err => {
-        // 输出错误信息
-        // console.log(err.message)
-        ElMessageBox.alert('请求失败', '警告', {
-          confirmButtonText: 'OK'
-        })
       })
+      // catch 再store/index.js中处理
     }
   }
 }
