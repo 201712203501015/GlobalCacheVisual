@@ -141,10 +141,10 @@
       // this.getDiskList()
     },
     unmounted () {
-      if(this.wsNodeList.readyState === WebSocket.OPEN){
+      // if(this.wsNodeList.readyState === WebSocket.OPEN){
         // 销毁长连接
-        this.wsNodeList.close(1000,"wsNodeList主动断开连接")
-      }
+        if(this.wsNodeList != null) this.wsNodeList.close(1000,"wsNodeList主动断开连接")
+      // }
       
   
       // 销毁所有Node信息
@@ -188,7 +188,6 @@
                   }
               }
               tp.push(tp_item)
-              this.loading = false // 解除转圈圈
           }
           // 更新表格数据
           if(this.nodeList.nodeId === null) {
@@ -200,6 +199,12 @@
           this.nodeList.nodeValue = tp_col
           // 更新状态
           this.nodeList.nodeState = tp_sta
+          // 解除转圈圈
+          if(this.loading === true)
+          {
+            this.loading = false // 第一次就变为false
+            this.clickNode({id:0}, {no:0}) // 点击0点
+          } 
       },
       
       // 点击单元格事件，改为pink粉色，表示选中
@@ -318,9 +323,10 @@
       },
       websocketonerror() { // 连接失败
         ElMessage({
-          message: '网络连接失败，CPU列表获取失败',
+          message: '网络连接异常，CPU列表获取失败，开始重连',
           type: 'warning',
         })
+        this.initNodeList()
       },
       websocketonmessage(ret) { // 数据接收
           // 接收到的类似send的数据，其中sendData.data 是要接受的数据
@@ -386,6 +392,8 @@
       },
       // 是否刷新页面
       nowF() {
+          // let time = new Date()
+          // console.log("time = ",time.toString())
           let ss = this.store.state.nowNodeType + this.store.state.nowNodeId
           return ss
       }

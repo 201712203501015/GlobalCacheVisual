@@ -137,9 +137,9 @@ export default {
     resizeObserver.observe(document.getElementById("netCharts"));
   },
   unmounted() {
-    if(this.wsNodeNet.readyState === WebSocket.OPEN){
-      this.wsNodeNet.close(1000,"wsNodeNet主动断开");
-    }
+    // if(this.wsNodeNet.readyState === WebSocket.OPEN){
+      if(this.wsNodeNet != null) this.wsNodeNet.close(1000,"wsNodeNet主动断开");
+    // }
     
     // 销毁时，取消监听
     window.removeEventListener("resize", this.screenAdapter);
@@ -170,9 +170,11 @@ export default {
     },
     websocketonerror() {
       ElMessage({
-        message: '网络连接失败，网络信息获取失败',
+        message: '网络连接异常，网络信息获取失败，开始重连',
         type: 'warning',
       })
+      //链接建立失败重连
+      this.initNodeNet();
     },
     websocketonmessage(ret) {
       // 数据接收

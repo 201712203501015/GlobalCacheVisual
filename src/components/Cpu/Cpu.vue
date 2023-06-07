@@ -95,10 +95,13 @@ export default {
   },
   unmounted() {
     // console.log('这是CPU.vue被销毁了')
-    if(this.wsNodeCpu.readyState === WebSocket.OPEN){
+    // if(this.wsNodeCpu.readyState === WebSocket.OPEN){
       // 断开连接
-      this.wsNodeCpu.close(1000,"前端NodeCPU主动关闭连接")
-    }
+      if(this.wsNodeCpu)
+      {
+        this.wsNodeCpu.close(1000,"前端NodeCPU主动关闭连接")
+      }
+    // }
     
     // 销毁时，取消监听
     window.removeEventListener("resize", this.screenAdapter);
@@ -131,9 +134,11 @@ export default {
     },
     websocketonerror() {
       ElMessage({
-        message: '网络连接失败，CPU信息获取失败',
+        message: '网络连接异常，CPU信息获取失败，开始重连',
         type: 'warning',
       })
+      //链接建立失败重连
+      this.initNodeCpu();
     },
     websocketonmessage(ret) {
       // 数据接收

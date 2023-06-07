@@ -93,10 +93,10 @@ export default {
     resizeObserver.observe(document.getElementById("memoryCharts"));
   },
   unmounted () {
-    if(this.wsNodeMemory.readyState === WebSocket.OPEN){
+    // if(this.wsNodeMemory.readyState === WebSocket.OPEN){
       // 销毁长连接
-      this.wsNodeMemory.close(1000,'前端wsNodeMemory主动关闭')
-    }
+      if(this.wsNodeMemory != null) this.wsNodeMemory.close(1000,'前端wsNodeMemory主动关闭')
+    // }
     // 销毁时，取消监听
     window.removeEventListener('resize', this.screenAdapter)
   },
@@ -124,9 +124,11 @@ export default {
     },
     websocketonerror() { // 连接失败
       ElMessage({
-        message: '网络连接失败，内存信息获取失败',
+        message: '网络连接异常，内存信息获取失败，开始重连',
         type: 'warning',
       })
+      //链接建立失败重连
+      this.initNodeMemory();
     },
     websocketonmessage(ret) { // 数据接收
         // 接收到的类似send的数据，其中sendData.data 是要接受的数据

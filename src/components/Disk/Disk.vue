@@ -173,9 +173,9 @@ export default {
   },
   unmounted() {
     // 销毁长连接
-    if(this.wsNodeDisk.readyState === WebSocket.OPEN){
-      this.wsNodeDisk.close(1000,'前端wsNodeDisk主动关闭');
-    }
+    // if(this.wsNodeDisk.readyState === WebSocket.OPEN){
+      if(this.wsNodeDisk != null) this.wsNodeDisk.close(1000,'前端wsNodeDisk主动关闭');
+    // }
     
     // 销毁时，取消监听
     window.removeEventListener("resize", this.screenAdapter);
@@ -220,9 +220,11 @@ export default {
     },
     websocketonerror() {
       ElMessage({
-        message: '网络连接失败，Disk信息获取失败',
+        message: '网络连接异常，Disk信息获取失败，开始重连',
         type: 'warning',
       })
+      //链接建立失败重连
+      this.initNodeDisk();
     },
     websocketonmessage(ret) {
       // 数据接收

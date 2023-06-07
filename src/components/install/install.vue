@@ -85,8 +85,9 @@ export default {
     // this.sendInstall()
   },
   unmounted() {
-    if(this.timeId != null) {
-      clearInterval(this.timeId)
+    if(this.timeId) {
+      window.clearInterval(this.timeId)
+      this.timeId = null
     }
   },
   methods: {
@@ -186,7 +187,7 @@ export default {
                 this.installProcess = 2
                 this.nowSuccess = 0
                 this.onceClick = 0; // 鼠标可以再次点击
-                clearInterval(this.timeId); // 销毁定时器
+                window.clearInterval(this.timeId); this.timeId = null// 销毁定时器
               })
             }
             else {
@@ -206,7 +207,7 @@ export default {
                   this.isEnd = 0
                 }
                 this.onceClick = 0; // 鼠标可以再次点击
-                clearInterval(this.timeId); // 销毁定时器
+                window.clearInterval(this.timeId); this.timeId = null // 销毁定时器
               }
             }
           }

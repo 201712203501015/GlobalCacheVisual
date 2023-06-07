@@ -143,15 +143,16 @@ export default {
   },
   unmounted () {
     // 自动退出 -- 删除定时器
-    if(this.timId != null) {
-      clearInterval(this.timId)
+    if(this.timId) {
+      window.clearInterval(this.timId)
+      this.timId = null
     }
   },
   methods: {
     goto(path) {
       if (path === "mainView") {
-        // 清空当前视图
-        this.store.commit("changeView", null);
+        // 切换到nodeView视图
+        this.store.commit("changeView", 'nodeView');
       }
       if(path === 'autoDepl') {
         // 如果要进行自动化部署，先要判断，是否自动化部署完毕，如果部署完毕，不需要再次部署
@@ -208,8 +209,9 @@ export default {
     async logout() {
       await this.$store.dispatch('logout').then(() => {
         // 用户登出 -- 删除定时器
-        if(this.timId != null) {
-          clearInterval(this.timId)
+        if(this.timId) {
+          window.clearInterval(this.timId)
+          this.timId = null
         }
         // this.$router.push({path:'/loginView'})
         this.$router.push(`/loginView?redirect=${this.$route.fullPath}`).catch(err=>err)

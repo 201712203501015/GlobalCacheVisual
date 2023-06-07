@@ -105,7 +105,7 @@ export default {
   created() {
     // 页面初始化为 LogicId=0 
     this.store.commit('changeLogicId',0)
-    // 清空当前视图
+    // 改变当前为Node视图视图
     this.store.commit('changeView',null)
     // 监听选项卡变化
     this.$store.watch((state, getters) => {
@@ -174,7 +174,7 @@ export default {
     },
     // Logic选项变化
     changeLogic (index) {
-      // console.log('当前index = ',index,typeof(index))
+      console.log('当前index = ',index,typeof(index))
       // 修改当前栏目
       this.currentLogicItem = index
       // 切换路由

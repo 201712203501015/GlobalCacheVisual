@@ -300,8 +300,9 @@ export default {
     },600000)
   },
   unmounted() {
-    if(this.timId != null) {
-      clearInterval(this.timeId)
+    if(this.timId) {
+      window.clearInterval(this.timeId)
+      this.timeId = null
     }
   },
   methods: {
@@ -344,6 +345,11 @@ export default {
     },
     // 跳转到Node
     goto(path) {
+      // 删除定时器
+      if(this.timId) {
+        window.clearInterval(this.timeId)
+        this.timeId = null
+      }
       this.$router.push({
         name: path,
         query: {

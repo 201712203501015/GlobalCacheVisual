@@ -75,8 +75,9 @@ export default {
   },
   unmounted () {
     // 销毁时间戳
-    if(this.timId != null) {
-      clearInterval(this.timId)
+    if(this.timId) {
+      window.clearInterval(this.timId)
+      this.timId = null
     }
   },
   data () {
