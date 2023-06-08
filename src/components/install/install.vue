@@ -31,7 +31,7 @@
       <!-- 下一步按钮 -->
       <el-button v-if="nowSuccess===1" type="primary" @click="Begin(true,0)">下一步</el-button>
       <!-- 重新安装 -->
-      <el-button v-if="nowSuccess===2" type="primary" @click="Begin(false,0)">重新安装</el-button>
+      <el-button v-if="nowSuccess===2" type="primary" @click="Begin(true,0)">重新安装</el-button>
       
       <!-- 完成按钮 -->
       <el-button v-if="isEnd===1" type="primary" @click="goto('userView')">完成</el-button>
