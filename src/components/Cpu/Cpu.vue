@@ -45,6 +45,8 @@ export default {
   },
   data() {
     return {
+      // nodeId
+      nodeId: -1,
       // nodeCpu的监听
       wsNodeCpu: null,
       // nodeCpu监听到的信息
@@ -70,11 +72,19 @@ export default {
       },
       // echarts图表宽度
       chartOffsetWidth: null,
+      // 定时器ID
+      timeId: null,
     };
   },
   created() {
     // 建立长连接
     this.initNodeCpu();
+    // setInterval(()=>{
+    //   if(this.wsNodeCpu.readyState === 3)
+    //   {
+
+    //   }
+    // },1000);
   },
   mounted() {
     // 建立长连接
@@ -93,19 +103,27 @@ export default {
     // 开启监听
     resizeObserver.observe(document.getElementById("cpuCharts"));
   },
+  beforeUnmount () {
+    // console.log("cpu berdestory")
+    // 断开连接
+    if(this.wsNodeCpu != null)
+    {
+      // this.wsNodeCpu.onclose = () => {console.log("1111");}
+      this.wsNodeCpu.close(1000,"前端NodeCPU主动关闭连接")
+    }
+    // 清楚定时器
+    window.clearTimeout(this.timeId)
+  },
   unmounted() {
+    // console.log("cpu destory",this.wsNodeCpu)
     // console.log('这是CPU.vue被销毁了')
     // if(this.wsNodeCpu.readyState === WebSocket.OPEN){
-      // 断开连接
-      if(this.wsNodeCpu)
-      {
-        this.wsNodeCpu.close(1000,"前端NodeCPU主动关闭连接")
-      }
     // }
     
     // 销毁时，取消监听
     window.removeEventListener("resize", this.screenAdapter);
   },
+  expose: ['destroycpuWS'], // 向外暴露
   methods: {
     // wsNodeList 初始化
     initNodeCpu() {
@@ -120,7 +138,7 @@ export default {
       // console.log("NodeCpu WebSocket连接成功");
       // 连接成功后直接发送数据
       // console.log('nowNodeId, readyState = ',this.store.state.nowNodeId,this.wsNodeCpu.readyState)
-      if(this.wsNodeCpu.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
+      if(this.wsNodeCpu != null && this.wsNodeCpu.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
         this.wsNodeCpu.send(
           JSON.stringify({
             url: "/getCpuData",
@@ -133,12 +151,11 @@ export default {
       }
     },
     websocketonerror() {
-      ElMessage({
-        message: '网络连接异常，CPU信息获取失败，开始重连',
-        type: 'warning',
-      })
       //链接建立失败重连
-      this.initNodeCpu();
+      window.clearTimeout(this.timeId)
+      this.timeId = setTimeout(()=>{
+        this.initNodeCpu();
+      },1000)
     },
     websocketonmessage(ret) {
       // 数据接收
@@ -195,9 +212,30 @@ export default {
     },
     // .close(1000)调用时，触发onclose事件
     websocketclose(ret) {
-      // 监听WebSocket的readyState变为CLOSED时
+      // （1）先销毁实例
+      this.wsNodeCpu = null
+      // 异常退出时提示
+      if(ret.code === 1006)
+      {
+        if(this.nodeId === this.store.state.nowNodeId) // （2）只提示一次，注意定义，并更新this.nodeId
+        {
+          ElMessage({
+            message: '网络连断开，CPU信息获取失败',
+            type: 'warning',
+          })
+        }
+      }
       // console.log("wsNodeCpu连接失败 (" + ret.code + "), reason = " + ret.reason);
       // console.log('======',this.wsNodeCpu)
+    },
+    // 销毁WS实例
+    destroycpuWS() {
+      // console.log("cpu子组件关闭")
+      if(this.wsNodeCpu != null)
+      {
+        // this.wsNodeCpu.onclose = () => {console.log("1111");}
+        this.wsNodeCpu.close(1000,"前端NodeCPU主动关闭连接")
+      }
     },
     // 保留2位，不足加0
     to2Str(num) {
@@ -212,6 +250,7 @@ export default {
       let nodeCpuTitle = "ERROR";
       if (this.store.state.nowNodeId != null) {
         nodeCpuTitle = "Node" + this.store.state.nowNodeId + "的CPU利用率";
+        this.nodeId = this.store.state.nowNodeId
       }
       let chartDom = document.getElementById("cpuCharts");
       this.echartsInstance = markRaw(this.$echarts.init(chartDom));
@@ -280,6 +319,7 @@ export default {
       let nodeCpuTitle = "ERROR";
       if (this.store.state.nowNodeId != null) {
         nodeCpuTitle = "Node" + this.store.state.nowNodeId + "的CPU利用率";
+        this.nodeId = this.store.state.nowNodeId
       }
       let option = {
         title: {

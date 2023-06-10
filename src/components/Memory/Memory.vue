@@ -53,6 +53,7 @@ export default {
   },
   data () {
     return {
+      nodeId: -1,
       // nodeMemory的监听
       wsNodeMemory: null,
       // 接收数据
@@ -71,6 +72,7 @@ export default {
       },
       // echarts图表宽度
       chartOffsetWidth: null,
+      timeId: null,
     }
   },
   created () {
@@ -92,14 +94,21 @@ export default {
     // 开启监听
     resizeObserver.observe(document.getElementById("memoryCharts"));
   },
+  beforeUnmount () {
+    if(this.wsNodeMemory != null)
+    {
+      this.wsNodeMemory.close(1000,'前端wsNodeMemory主动关闭')
+    }
+    window.clearTimeout(this.timeId)
+  },
   unmounted () {
     // if(this.wsNodeMemory.readyState === WebSocket.OPEN){
       // 销毁长连接
-      if(this.wsNodeMemory != null) this.wsNodeMemory.close(1000,'前端wsNodeMemory主动关闭')
     // }
     // 销毁时，取消监听
     window.removeEventListener('resize', this.screenAdapter)
   },
+  expose: ['destroymemoryWS'],
   methods: {
     // wsNodeDisk
     initNodeMemory () {
@@ -112,7 +121,7 @@ export default {
     websocketonopen() { // 连接成功
       // console.log("NodeMemory WebSocket连接成功")
       // 连接成功后直接发送数据
-      if(this.wsNodeMemory.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
+      if(this.wsNodeMemory != null && this.wsNodeMemory.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
         this.wsNodeMemory.send(JSON.stringify({
           url: '/getMemoryData',
           params: {
@@ -123,12 +132,11 @@ export default {
       }
     },
     websocketonerror() { // 连接失败
-      ElMessage({
-        message: '网络连接异常，内存信息获取失败，开始重连',
-        type: 'warning',
-      })
       //链接建立失败重连
-      this.initNodeMemory();
+      window.clearTimeout(this.timeId)
+      this.timeId = setTimeout(()=>{
+        this.initNodeMemory();
+      },1000)
     },
     websocketonmessage(ret) { // 数据接收
         // 接收到的类似send的数据，其中sendData.data 是要接受的数据
@@ -157,7 +165,27 @@ export default {
         }
     },
     websocketclose(ret) { // 关闭
+      // (1)先销毁实例
+      this.wsNodeMemory = null
+      // (2)异常退出时提示
+      if(ret.code === 1006)
+      {
+        if(this.nodeId === this.store.state.nowNodeId)
+        {
+          ElMessage({
+            message: '网络连接断开，内存信息获取失败',
+            type: 'warning',
+          })
+        }
+      }
         // console.log('wsNodeMemory连接关闭 (' + ret.code + '),reason = ' + ret.reason)
+    },
+    destroymemoryWS() {
+      // console.log("调用了memory")
+      if(this.wsNodeMemory != null)
+      {
+        this.wsNodeMemory.close(1000,'前端wsNodeMemory主动关闭')
+      }
     },
     // 保留2位，不足加0
     to2Str(num) {
@@ -180,6 +208,7 @@ export default {
       let nodeMemoryTitle = "ERROR"
       if(this.store.state.nowNodeId != null){
         nodeMemoryTitle = "Node" + this.store.state.nowNodeId.toString() + "的内存使用情况"
+        this.nodeId = this.store.state.nowNodeId
       }
       let chartDom = document.getElementById("memoryCharts");
       this.echartsInstance = markRaw(this.$echarts.init(chartDom));
@@ -262,6 +291,7 @@ export default {
       let nodeMemoryTitle = "ERROR"
       if(this.store.state.nowNodeId != null){
         nodeMemoryTitle = "Node" + this.store.state.nowNodeId.toString() + "的内存使用情况"
+        this.nodeId = this.store.state.nowNodeId
       }
       const titleSize = (this.chartOffsetWidth / 100) * 2.5
       let option = {

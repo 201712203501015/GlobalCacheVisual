@@ -958,6 +958,7 @@ Mock.mock('http://localhost:8899/getIpList','post',(req) => {
 
 // getAddIP
 Mock.mock('http://localhost:8899/getAddIP','post',(req) => {
+  // return null
   let ipAddress = JSON.parse(req.body).ipAddress
   if(ipAddress === '127.0.0.1') {
     return {

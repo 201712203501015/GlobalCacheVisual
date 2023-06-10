@@ -174,7 +174,7 @@ export default {
     },
     // Logic选项变化
     changeLogic (index) {
-      console.log('当前index = ',index,typeof(index))
+      // console.log('当前index = ',index,typeof(index))
       // 修改当前栏目
       this.currentLogicItem = index
       // 切换路由

@@ -93,6 +93,7 @@ export default {
   },
   data() {
     return {
+      nodeId: -1,
       // nodeNet的监听
       wsNodeNet: null,
       // 接受的数据
@@ -117,6 +118,7 @@ export default {
       netChartReceiveData: [], // 接收数据
       // echarts图表宽度
       chartOffsetWidth: null,
+      timeId: null
     };
   },
   created() {
@@ -136,14 +138,21 @@ export default {
     // 开启监听
     resizeObserver.observe(document.getElementById("netCharts"));
   },
+  beforeUnmount () {
+    if(this.wsNodeNet != null)
+    {
+      this.wsNodeNet.close(1000,"wsNodeNet主动断开");
+    }
+  },
   unmounted() {
     // if(this.wsNodeNet.readyState === WebSocket.OPEN){
-      if(this.wsNodeNet != null) this.wsNodeNet.close(1000,"wsNodeNet主动断开");
+      
     // }
     
     // 销毁时，取消监听
     window.removeEventListener("resize", this.screenAdapter);
   },
+  expose: ['destroynetWS'],
   methods: {
     initNodeNet() {
       this.wsNodeNet = new WebSocket("ws://"+IP+WEBSOCKET_PORT);
@@ -156,7 +165,7 @@ export default {
       // 连接成功
       // console.log("NodeNet WebSocket连接成功");
       // 连接成功后直接发送数据
-      if(this.wsNodeNet.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
+      if(this.wsNodeNet != null && this.wsNodeNet.readyState === 1 && this.store.state.nowNodeId != null && this.store.state.nowNodeId != undefined) {
         this.wsNodeNet.send(
           JSON.stringify({
             url: "/getNetData",
@@ -169,12 +178,11 @@ export default {
       }
     },
     websocketonerror() {
-      ElMessage({
-        message: '网络连接异常，网络信息获取失败，开始重连',
-        type: 'warning',
-      })
       //链接建立失败重连
-      this.initNodeNet();
+      window.clearTimeout(this.timeId)
+      this.timeId = setTimeout(()=>{
+        this.initNodeNet();
+      },1000)
     },
     websocketonmessage(ret) {
       // 数据接收
@@ -224,8 +232,26 @@ export default {
       }
     },
     websocketclose(ret) {
-      // 关闭
+      // (1)销毁实例
+      this.wsNodeNet = null
+      // (2)异常退出时提示
+      if(ret.code === 1006)
+      {
+        if(this.nodeId === this.store.state.nowNodeId)
+        {
+          ElMessage({
+            message: '网络连接断开，网络信息获取失败',
+            type: 'warning',
+          })
+        }
+      }
       // console.log("wsNodeNet连接关闭 (" + ret.code + "),reason = " + ret.reason);
+    },
+    destroynetWS() {
+      if(this.wsNodeNet != null)
+      {
+        this.wsNodeNet.close(1000,"wsNodeNet主动断开");
+      }
     },
     // 保留2位，不足加0
     to2Str(num) {
@@ -249,6 +275,7 @@ export default {
       if (this.store.state.nowNodeId != null) {
         nodeNetTitle =
           "Node" + this.store.state.nowNodeId + "的Net" + this.netId + "发收速率";
+        this.nodeId = this.store.state.nowNodeId
       }
       let chartDom = document.getElementById("netCharts");
       this.echartsInstance = markRaw(this.$echarts.init(chartDom));
@@ -368,6 +395,7 @@ export default {
       if (this.store.state.nowNodeId != null) {
         nodeNetTitle =
           "Node" + this.store.state.nowNodeId + "的Net" + this.netId + "发收速率";
+        this.nodeId = this.store.state.nowNodeId
       }
       const titleSize = (this.chartOffsetWidth / 100) * 2.5
       let option = {

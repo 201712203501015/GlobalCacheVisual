@@ -36,12 +36,12 @@
       <div class="com-bottom">
           <!-- :key作用： 给vue 元素渲染的时候用的，每次渲染的时候会去拿这个key 值做对比，
           如果这一次的key 值和上一次的key值是不一样的才会重新渲染dom 元素，否则保持上一次的元素状态 :key="this.store.state.nowNodeId" -->
-          <Cpu v-if="nodeCpu" :key="nowF"></Cpu>
-          <Disk v-if="nodeDisk" :key="nowF"></Disk>
-          <Memory v-if="nodeMemory" :key="nowF"></Memory>
-          <Net v-if="nodeNet" :key="nowF"></Net>
-          <Ptpg v-if="nodePtpg" :key="nowF"></Ptpg>
-          <Health v-if="nodeHealth" :key="nowF"></Health>
+          <Cpu ref="cpu" v-if="nodeCpu" :key="nowF"></Cpu>
+          <Disk ref="disk" v-if="nodeDisk" :key="nowF"></Disk>
+          <Memory ref="memory" v-if="nodeMemory" :key="nowF"></Memory>
+          <Net ref="net" v-if="nodeNet" :key="nowF"></Net>
+          <Ptpg ref="ptpg" v-if="nodePtpg" :key="nowF"></Ptpg>
+          <Health ref="health" v-if="nodeHealth" :key="nowF"></Health>
       </div>
     </div>
   </template>
@@ -140,10 +140,18 @@
       // 获取nodeList信息
       // this.getDiskList()
     },
+    beforeUnmount () {
+      // console.log("nodeRightSide berdestory")
+      // 销毁所有子组件
+      if(this.nodeCpu === true) this.$refs.cpu.destroycpuWS();
+      if(this.nodeDisk === true) this.$refs.disk.destroydiskWS();
+      if(this.nodeMemory === true) this.$refs.memory.destroymemoryWS();
+      if(this.nodeNet === true) this.$refs.net.destroynetWS();
+    },
     unmounted () {
       // if(this.wsNodeList.readyState === WebSocket.OPEN){
         // 销毁长连接
-        if(this.wsNodeList != null) this.wsNodeList.close(1000,"wsNodeList主动断开连接")
+        if(this.wsNodeList) this.wsNodeList.close(1000,"wsNodeList主动断开连接")
       // }
       
   
@@ -151,9 +159,9 @@
       // // 显示左侧视图
       // this.store.commit('changeView', null)
       // // 更新vuex中newNodeId
-      // this.store.commit('changeNodeId', null)
+      // this.store.commit('changeNodeId', "")
       // // 更新vuex中newNodeType
-      // this.store.commit('changeNodeType', null)
+      // this.store.commit('changeNodeType', "")
       // // 更新vuex中newNodeHealth
       // this.store.commit('changeNodeHealth', null)
     },
