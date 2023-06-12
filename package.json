@@ -16,9 +16,7 @@
     "vue": "^3.2.13",
     "vue-demi": "^0.14.1",
     "vue-router": "^4.0.3",
-    "vuex": "^4.1.0"
-  },
-  "devDependencies": {
+    "vuex": "^4.1.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
