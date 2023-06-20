@@ -407,6 +407,14 @@ Mock.mock('http://localhost:8899/getPgUpdate','post',(req) => {
 })
 
 // （三）自动化部署部分
+// getReset 重新自动化部署
+Mock.mock('http://localhost:8899/getReset','post',(req) => {
+  return {
+    data:{
+      isSuccessed: true // 返回接收状态
+    }
+  }
+})
 // getIpList
 Mock.mock('http://localhost:8899/getIpList','post',(req) => {
   return {

@@ -166,7 +166,26 @@ export default {
         // console.log("then = ",res)
         if(res === "confirm")
         {
-          this.goto(name)
+          // 向后台发送数据
+          API({
+            url: '/getReset',
+            method: 'post',
+            data:{
+              token: this.store.state.token,
+            }
+          }).then((res) => {
+            let recvdata = res.data.data
+            if(recvdata.isSuccessed === true)
+            {
+              this.goto(name) // 接收成功，重新部署
+            }
+          }).catch(err => {
+            // 接收失败，提示网络连接失败，无法部署
+            ElMessage({
+              message: '重新部署请求失败',
+              type: 'warning',
+            })
+          })
         }
       })
       .catch((res) => {
