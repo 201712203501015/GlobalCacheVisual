@@ -21,7 +21,7 @@
           <span>{{ isSuperUser === true ? "是":"否" }}</span>
           &nbsp;&nbsp;
           <!-- 超级管理员，可以采用自动化部署 -->
-          <el-button v-if="isSuperUser === true" type="primary" @click="reAutoDepl('autoDepl')" size="small" round>重新自动化部署</el-button>
+          <el-button v-if="isSuperUser === true && this.isFinished === true" type="primary" @click="reAutoDepl('autoDepl')" size="small" round>重新自动化部署</el-button>
         </el-form-item>
         <el-form-item label="是否完成自动化部署" class="form-box">
           <span class="autoDel" :class="{'un-autoDel':this.isFinished === false}">{{ messTip() }}</span>
