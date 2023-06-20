@@ -18,7 +18,10 @@
           {{ userName }}
         </el-form-item>
         <el-form-item label="是否是超级管理员" class="form-box">
-          {{ isSuperUser === true ? "是":"否" }}
+          <span>{{ isSuperUser === true ? "是":"否" }}</span>
+          &nbsp;&nbsp;
+          <!-- 超级管理员，可以采用自动化部署 -->
+          <el-button v-if="isSuperUser === true" type="primary" @click="reAutoDepl('autoDepl')" size="small" round>重新自动化部署</el-button>
         </el-form-item>
         <el-form-item label="是否完成自动化部署" class="form-box">
           <span class="autoDel" :class="{'un-autoDel':this.isFinished === false}">{{ messTip() }}</span>
@@ -147,6 +150,29 @@ export default {
         this.store.commit("changeView", null);
       }
       this.$router.replace({name:path}).catch(err=>err);
+    },
+    // 重新自动化部署
+    reAutoDepl(name) {
+      ElMessageBox.confirm(
+        '是否要重新自动化部署？',
+        '提示',
+        {
+          distinguishCancelAndClose: true,
+          confirmButtonText: '是',
+          cancelButtonText: '否',
+        }
+      )
+      .then((res) => {
+        // console.log("then = ",res)
+        if(res === "confirm")
+        {
+          this.goto(name)
+        }
+      })
+      .catch((res) => {
+        // console.log("catch = ",res) // 取消了，啥也不做
+      })
+        
     },
     // 登出
     async logout() {
