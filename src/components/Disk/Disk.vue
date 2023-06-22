@@ -5,7 +5,7 @@
     </el-col>
     <el-col
       :span="10"
-      style="height: 100%"
+      style="height: 100%;"
       v-loading="isHasData"
       element-loading-text="loading..."
     >
@@ -27,11 +27,11 @@
       </el-form> -->
       <!-- 下拉菜单结束 -->
       <span style="font-weight: bold; color=black; font-size: 20px;">
-        Node{{ nowNodeId }}的缓存盘 {{ this.diskInfo.diskId[this.diskId] }} 信息
+        Node{{ nowNodeId }}的{{ this.diskInfo.diskShowName[this.diskId] }}信息
       </span>
-      <el-row :gutter="20">
+      <el-row :gutter="10">
         <el-select
-          style="margin: 10px 10px 5px 5px;" 
+          style="margin: 5px 5px 0px 0px;" 
           v-model="nowDiskName"
         >
           <el-option
@@ -44,37 +44,37 @@
           </el-option>
         </el-select>
       </el-row>
-      <el-row :gutter="20">
-        <el-col :span="20"
+      <el-row :gutter="10">
+        <el-col :span="12"
           ><div class="grid-content ep-bg-purple" />
           名称：<span style="font-size: 24px">{{
             diskInfo.diskName[this.diskId]
           }}</span></el-col
         >
+        <el-col :span="12"
+          ><div class="grid-content ep-bg-purple" />
+          类型：<span style="font-size: 24px">{{
+            diskInfo.diskType[this.diskId]
+          }}</span></el-col
+        >
       </el-row>
-      <el-row :gutter="20">
+      <!-- <el-row :gutter="20">
         <el-col :span="20"
           ><div class="grid-content ep-bg-purple" />
           Sn号：<span style="font-size: 24px">{{
             diskInfo.diskSn[this.diskId]
           }}</span></el-col
         >
-      </el-row>
-      <el-row :gutter="20">
+      </el-row> -->
+      <el-row :gutter="10">
         <el-col :span="24"
           ><div class="grid-content ep-bg-purple" />
           容量：<span style="font-size: 24px"
             >{{ diskInfo.diskCapacity[this.diskId] }}TB</span
           ></el-col
         >
-        <!-- <el-col :span="12"
-          ><div class="grid-content ep-bg-purple" />
-          类型：<span style="font-size: 24px">{{
-            diskInfo.diskType[diskId]
-          }}</span></el-col
-        > -->
       </el-row>
-      <el-col :span="20">
+      <!-- <el-col :span="20">
         <div class="grid-content ep-bg-purple" />
         状态：<span style="font-size: 24px">
           <el-tag size="large">
@@ -83,8 +83,30 @@
             }}
           </el-tag>
         </span>
-      </el-col>
-      <el-row :gutter="20"> </el-row>
+      </el-col> -->
+      <el-row :gutter="10" 
+        v-if="diskInfo.type[this.diskId] === 1"
+        style="margin: 5px 0px 5px 5px;background-color: #faecd8;"
+      >
+        <el-table
+          :data="this.diskInfo.Child[this.diskId]"
+
+          height="200"
+          :header-cell-style="{background: '#d9ecff',height: '50px', color: 'black'}" 
+          border
+        >
+          <el-table-column prop="cacheName" label="cache名称"></el-table-column>
+          <el-table-column prop="diskId" label="diskId"></el-table-column>
+          <el-table-column prop="diskSn" label="Sn号"></el-table-column>
+          <el-table-column label="状态">
+            <template #default="st">
+              <el-tag size="large" :class="st.row.state === 'VDISK_STATE_UP' ? 'blue-tag':'red-tag' ">
+                {{ this.TranInfo(st.row.state) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-row>
       <!--<el-scrollbar style="height: 20%">
         <div class="scrollbar-flex-content">
           <p
@@ -119,6 +141,8 @@ export default {
       nodeId: -1,
       // nodeDisk的监听
       wsNodeDisk: null,
+      dkData: [], // 6-22，临时数据
+      diskId: 0, // 页面选中的diskId
 
       // 2-20 修改数据
       // echarts实时数据
@@ -129,21 +153,27 @@ export default {
         diskShowName: [], // el-option 遍历
         diskId: [],
         diskName: [],
-        diskSn: [],
+        // diskSn: [],
         diskCapacity: [],
-        state: [],
+        // state: [],
         diskType: [],
+        type: [],
+        Child: [], // 子菜单
+        // echarts 数据
+        diskIORatio: []
       },
       // 当前页面磁盘名称
-      nowDiskName: "磁盘0",
+      nowDiskName: "",
       diskInfoLength: 0, // （实际磁盘个数）页面展示磁盘信息个数
-      diskId: 0, // 页面选中的diskId
       // echarts图表
       echartsInstance: null,
       // echarts图表数据
-      diskChartData: [],
-      // echarts数据预处理
-      chartDataBefore: [],
+      diskChartData: {
+        name: null,
+        readRatio: [],
+        writeRatio: [],
+        diskNowTime: []
+      },
       // echarts图表宽度
       chartOffsetWidth: null,
       // 下拉菜单
@@ -193,9 +223,9 @@ export default {
     // 解释状态
     TranInfo(ss) {
       if(ss === 'VDISK_STATE_UP'){
-        return "磁盘处于UP，可服务IO的状态"
+        return "UP，可服务IO"
       }else if(ss === 'VDISK_STATE_DOWN'){
-        return "磁盘处于DOWN，不可服务IO的状态"
+        return "DOWN，不可服务IO"
       }
     },
     destroydiskWS() {
@@ -254,44 +284,59 @@ export default {
         this.store.state.nowNodeId === sendData.params.nodeId && 
         sendData.token === this.store.state.userToken
       ) {
-        // sendData.params = JSON.parse(sendData.params);
         // 接收数据
-        this.diskList = sendData.params;
-        // 2-20 修改数据
-        // echarts数据
-        this.diskIORatio = [];
-        this.diskIORatioLength = sendData.params.diskIORatio.length;
-        for (let i = 0; i < sendData.params.diskIORatio.length; i++) {
-          this.diskIORatio.push({
-            name: sendData.params.diskIORatio[i].name,
-            readRatio: sendData.params.diskIORatio[i].readRatio,
-            writeRatio: sendData.params.diskIORatio[i].writeRatio,
-            diskNowTime: sendData.params.diskIORatio[i].diskNowTime
-          });
+        let tpdata = JSON.parse(JSON.stringify(sendData.params['diskInfoMap']));
+        this.dkData = []
+        let i = 0
+        for(let key in tpdata)
+        {
+          this.dkData.push({
+            name: key,
+            diskId: i,
+            type: (key[0] == 's' ? 0:1),// 0:sda,1:nvme
+            diskBasicInfo: tpdata[key]['diskBasicInfo'],
+            diskIORatio: tpdata[key]['diskIORatio']
+          })
+          i += 1
         }
-        // 页面显示数据
-        this.diskInfoLength = sendData.params.diskInfo.length;
-        for (let i = 0; i < sendData.params.diskInfo.length; i++) {
+        // console.log("处理数组数据：",this.dkData)
+        // 6-22 修改数据
+        this.diskInfoLength = this.dkData.length;
+        for (let i = 0; i < this.dkData.length; i++) {
           // 初始化
           if (i === 0) {
             this.diskInfo.diskShowName = [];
             this.diskInfo.diskId = [];
             this.diskInfo.diskName = [];
-            this.diskInfo.diskSn = [];
             this.diskInfo.diskCapacity = [];
-            this.diskInfo.state = [];
             this.diskInfo.diskType = [];
+            this.diskInfo.Child = [];
+            this.diskInfo.type = [];
+            this.diskInfo.diskIORatio = [];
           }
-          // 存入数据
-          this.diskInfo.diskShowName.push("diskId " + sendData.params.diskInfo[i].diskId.toString())
-          this.diskInfo.diskId.push(sendData.params.diskInfo[i].diskId);
-          this.diskInfo.diskName.push(sendData.params.diskInfo[i].diskName);
-          this.diskInfo.diskSn.push(sendData.params.diskInfo[i].diskSn);
+          // 页面显示数据
+          this.diskInfo.diskShowName.push((this.dkData[i].type === 1?'缓存盘':'数据盘') + this.dkData[i].name)
+          this.diskInfo.diskId.push(this.dkData[i].diskId);
+          this.diskInfo.diskName.push(this.dkData[i].diskBasicInfo.name);
           this.diskInfo.diskCapacity.push(
-            sendData.params.diskInfo[i].diskCapacity.toFixed(2)
+            this.dkData[i].diskBasicInfo.diskCapacity.toFixed(2)
           );
-          this.diskInfo.state.push(sendData.params.diskInfo[i].state);
-          this.diskInfo.diskType.push(sendData.params.diskInfo[i].diskType);
+          this.diskInfo.diskType.push(this.dkData[i].diskBasicInfo.diskType);
+          this.diskInfo.type.push(this.dkData[i].type)
+          if(this.dkData[i].type === 1) {
+            this.diskInfo.Child.push(
+              JSON.parse(JSON.stringify(this.dkData[i].diskBasicInfo.cacheInfolist)) // 子菜单
+            )
+          } else {
+            this.diskInfo.Child.push([]) 
+          }
+          // echarts显示数据
+          this.diskInfo.diskIORatio.push({
+            name: this.dkData[i].diskIORatio.name,
+            readRatio: this.dkData[i].diskIORatio.readRatioArr,
+            writeRatio: this.dkData[i].diskIORatio.writeRatioArr,
+            diskNowTime: this.dkData[i].diskIORatio.diskNowTimeArr
+          })
         }
         this.nowDiskName = this.diskInfo.diskShowName[this.diskId]
         // 更新图表
@@ -342,6 +387,9 @@ export default {
         title: {
           text: nodeDiskTitle,
           left: 20,
+        },
+        grid: {
+          x: 70,
         },
         tooltip: {
           trigger: "axis",
@@ -400,25 +448,12 @@ export default {
     },
     // 更新图表数据
     getChartData() {
-      // 针对diskIORatio
-      if (this.diskChartData.length === 0) {
-        // 根据数组长度赋值
-        for (let i = 0; i < this.diskIORatioLength; i++) {
-          this.diskChartData.push({
-            name: this.diskIORatio[i].name,
-            readRatio: [],
-            writeRatio: [],
-            time: [],
-          });
-        }
-      }
+      // 更新名称
+      this.diskChartData.name = this.diskInfo.diskShowName[this.diskId]
       // 覆盖数组
-      for (let i = 0; i < this.diskIORatioLength; i++) {
-        this.diskChartData[i].readRatio = this.toFix2(this.diskIORatio[i].readRatio);
-        this.diskChartData[i].writeRatio = this.toFix2(this.diskIORatio[i].writeRatio);
-        this.diskChartData[i].time = this.diskIORatio[i].diskNowTime;
-      }
-
+      this.diskChartData.readRatio = this.toFix2(this.diskInfo.diskIORatio[ this.diskId ].readRatio);
+      this.diskChartData.writeRatio = this.toFix2(this.diskInfo.diskIORatio[ this.diskId ].writeRatio);
+      this.diskChartData.time = this.diskInfo.diskIORatio[ this.diskId ].diskNowTime;
       this.updateChart();
     },
     // 更新图表界面
@@ -428,39 +463,37 @@ export default {
         nodeDiskTitle =
           "Node" +
           this.store.state.nowNodeId.toString() +
-          "的缓存盘" +
+          "的" + this.diskChartData.name + 
           "读写速率";
         this.nodeId = this.store.state.nowNodeId
       }
       let seriesList = [];
       let legendData = [];
-      for (let i = 0; i < this.diskChartData.length; i++) {
-        let name = this.diskChartData[i].name;
-        let readRatio = this.diskChartData[i].readRatio;
-        let writeRatio = this.diskChartData[i].writeRatio;
-        legendData.push(name + "R");
-        legendData.push(name + "W");
-        seriesList.push({
-          // 读数据
-          name: name + "R",
-          data: readRatio,
-          type: "line",
-          areaStyle: {
-            normal: {},
-          },
-        });
-        seriesList.push({
-          // 写数据
-          name: name + "W",
-          data: writeRatio,
-          type: "line",
-          areaStyle: {
-            normal: {},
-          },
-        });
-      }
+      let name = this.diskChartData.name;
+      let readRatio = this.diskChartData.readRatio;
+      let writeRatio = this.diskChartData.writeRatio;
+      legendData.push(name + "R");
+      legendData.push(name + "W");
+      seriesList.push({
+        // 读数据
+        name: name + "R",
+        data: readRatio,
+        type: "line",
+        areaStyle: {
+          normal: {},
+        },
+      });
+      seriesList.push({
+        // 写数据
+        name: name + "W",
+        data: writeRatio,
+        type: "line",
+        areaStyle: {
+          normal: {},
+        },
+      });
       // 时间数据
-      let time = this.diskChartData[0].time;
+      let time = this.diskChartData.time;
       const titleSize = (this.chartOffsetWidth / 100) * 2.5;
       let option = {
         title: {
@@ -506,7 +539,7 @@ export default {
     changeDisk(id) {
       this.diskId = id;
       this.nowDiskName = this.diskInfo.diskShowName[id]
-      this.updateChart();
+      this.getChartData();
     },
   },
   computed: {
@@ -541,5 +574,15 @@ export default {
   border-radius: 4px;
   background: #409eff;
   color: white;
+}
+
+.red-tag {
+  color: #f56c6c;
+  background-color: #fde2e2;
+}
+
+.blue-tag {
+  color: #409eff;
+  background-color: #ecf5ff;
 }
 </style>

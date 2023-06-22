@@ -177,6 +177,7 @@ export default {
             let recvdata = res.data.data
             if(recvdata.isSuccessed === true)
             {
+              this.store.commit("changeIsFinished",false) // 修改完成，不能查看视图
               this.goto(name) // 接收成功，重新部署
             }
           }).catch(err => {
