@@ -90,12 +90,12 @@
       >
         <el-table
           :data="this.diskInfo.Child[this.diskId]"
-
+          style="--el-table-border-color:white;"
           height="200"
           :header-cell-style="{background: '#d9ecff',height: '50px', color: 'black'}" 
           border
         >
-          <el-table-column prop="cacheName" label="cache名称"></el-table-column>
+          <el-table-column prop="cacheName" label="cache分区"></el-table-column>
           <el-table-column prop="diskId" label="diskId"></el-table-column>
           <el-table-column prop="diskSn" label="Sn号"></el-table-column>
           <el-table-column label="状态">
@@ -472,11 +472,11 @@ export default {
       let name = this.diskChartData.name;
       let readRatio = this.diskChartData.readRatio;
       let writeRatio = this.diskChartData.writeRatio;
-      legendData.push(name + "R");
-      legendData.push(name + "W");
+      legendData.push(name + "读速率");
+      legendData.push(name + "写速率");
       seriesList.push({
         // 读数据
-        name: name + "R",
+        name: name + "读速率",
         data: readRatio,
         type: "line",
         areaStyle: {
@@ -485,7 +485,7 @@ export default {
       });
       seriesList.push({
         // 写数据
-        name: name + "W",
+        name: name + "写速率",
         data: writeRatio,
         type: "line",
         areaStyle: {
