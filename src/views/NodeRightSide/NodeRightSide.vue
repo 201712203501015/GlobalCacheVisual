@@ -234,12 +234,13 @@
   
           let lastNode = this.nowNode // 上一个节点
           let colName = "column" + column.no.toString()
+          let idNum = this.nodeList.nodeId[row.id][colName].nodeIdNum // nodeId的实际编号
           // 更新当前节点
           this.nowNode = id
           // 变为选中节点
           this.nodeList.nodeId[row.id][colName].isSelect = true
           // 更新vuex中newNodeId,显示Node左侧栏
-          this.store.commit('changeNodeId', id)
+          this.store.commit('changeNodeId', idNum)
           // 更新vuex中newNodeType
           if(this.store.state.nowNodeType == null) {
               this.store.commit('changeNodeType', 'cpu')

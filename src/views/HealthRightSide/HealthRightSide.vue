@@ -104,7 +104,7 @@ export default {
       }).then((res) => {
         let recvdata = res.data.data
         this.healthList = recvdata.healthInfo
-        this.clusterState = recvdata.clusterState
+        this.clusterState = (recvdata.clusterState === "false" ? false:true)
         // 不用转圈圈
         this.loading = false
       }).catch(err => {

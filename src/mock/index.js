@@ -1222,7 +1222,7 @@ Mock.mock('http://localhost:8899/getHealthInfo','post',(req) => {
   return {
     data:{
       healthInfo: healthInfo, // 健康信息
-      clusterState: (Math.floor(Math.random()*15)%2 === 0 ? true: false) // 集群总体状态
+      clusterState: (Math.floor(Math.random()*15)%2 === 0 ? "true": "false") // 集群总体状态
     }
   }
 })
