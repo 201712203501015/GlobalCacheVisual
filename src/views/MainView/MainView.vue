@@ -90,7 +90,7 @@ export default {
       defaultOption: '请选择视图',
       // Node左侧标题
       nodeTitle: [
-        'CPU','磁盘','内存','网络','PT和PG','健康状态'
+        'CPU','磁盘','内存','网络','PT和PG','Node状态'
       ],
       // Node左侧标题数据
       nodeData: [
@@ -229,7 +229,9 @@ export default {
     isNode () {
       // Node左侧栏受nodeId的影响
       // nowView决定选择栏
-      if(this.store.state.nowView === 'nodeView' && this.store.state.nowNodeId != null) {
+      if(this.store.state.nowView === 'nodeView' 
+        && this.store.state.nowNodeId != null 
+        && this.store.state.nodeIsOnline === true) {
         return true
       }
       return false

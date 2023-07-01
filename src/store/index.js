@@ -28,7 +28,10 @@ export default createStore({
       // 逻辑信息
       nowLogicId: 0,// 0，PT；1，PG；2：CLI；
       // 健康监控信息
-      nowHealthState: null, // 当前节点健康信息
+      // nowHealthState: null, // 
+      nodeIsIn: null, // 当前节点是否是in
+      nodeIsRunning: null,  // 当前节点是否running正常
+      nodeIsOnline: null, // 当前节点是否在线
 
       // 自动化部署部分
       activeStep: 0, // 当前是第几步
@@ -92,8 +95,14 @@ export default createStore({
       state.nowNodeType = newNodeType
     },
     // 更新node的健康状态
-    changeNodeHealth (state, healthState) {
-      state.nowNodeHealth = healthState
+    changeNodeIsIn (state, newValue) {
+      state.nodeIsIn = newValue
+    },
+    changeNodeIsRunning (state, newValue) {
+      state.nodeIsRunning = newValue
+    },
+    changeNodeIsOnline (state, newValue) {
+      state.nodeIsOnline = newValue
     },
     // 更新 逻辑视图 的视图选项
     changeLogicId (state, index) {

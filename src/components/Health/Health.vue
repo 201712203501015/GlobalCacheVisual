@@ -7,7 +7,9 @@
         'running_1':getHealth === 'running_1',
         }"
     >
-      <span style="font-weight: bold;"> Node{{ this.store.state.nowNodeId }}的健康状态是：{{ this.showHealthInfo(this.store.state.nowNodeHealth) }}</span>
+      <span style="font-weight: bold;">
+        Node{{ this.store.state.nowNodeId }}的状态是：{{ this.showNodeState(this.store.state.nodeIsOnline,this.store.state.nodeIsIn,this.store.state.nodeIsRunning) }}
+      </span>
       <!-- this.store.state.nowHealthState是CPU的值 -->
       <!-- nodeCPU值 {{ this.store.state.nowHealthState }} -->
     </div>
@@ -29,22 +31,37 @@ export default {
   methods: {
     // 根据node状态，在页面实现不同的文字
     showHealthInfo(ss) {
-      if(ss === 'NODE_STATE_RUNNING') {
-        return '节点正常'
-      }else if( ss === 'NODE_STATE_DOWN') {
-        return '节点DOWN，无法正常工作'
-      }else if( ss === 'NODE_STATE_INVALID' ) {
-        return '无效节点'
+      if(ss === 'NODE_STATE_INVALID') {
+        return '非法状态'
+      }else if( ss === 'NODE_STATE_UP') {
+        return '正在启动'
+      }else if( ss === 'NODE_STATE_DOWN' ) {
+        return '下线状态'
+      }else if( ss === 'NODE_STATE_RUNNING') {
+        return '正在工作'
+      }else if( ss === 'NODE_STATE_IN') {
+        return '在集群中'
+      }else if( ss === 'NODE_STATE_OUT') {
+        return '不在集群中'
       }
       return 'ERROR' // 这就出错了
+    },
+    showNodeState(isOnline,isIn,isRunning) {
+      if(isOnline === false) {
+        return '离线状态'
+      }
+      let ans = this.showHealthInfo(isIn) + "," + this.showHealthInfo(isRunning)
+      return ans
     }
   },
   computed: {
     getHealth () {
-      if(this.store.state.nowNodeHealth === 'NODE_STATE_DOWN') {
-        return 'running_0';
+      if(this.store.state.nodeIsOnline === true &&
+      this.store.state.nodeIsIn === 'NODE_STATE_IN' &&
+      this.store.state.nodeIsRunning === 'NODE_STATE_RUNNING') {
+        return 'running_1';
       } else {
-        return 'running_1'
+        return 'running_0'
         // if(0 <= this.store.state.nowHealthState < 0.25){
         //   return 'running_1'
         // }else if(0.25 <= this.store.state.nowHealthState < 0.5){
@@ -70,8 +87,8 @@ export default {
   width: 100%;
   height: 100%;
   border: 1px solid #e1e3e7;
-  background-color: red;
-  color: black;
+  background-color: white;
+  color: red;
 }
 .running_1{
   display: flex;

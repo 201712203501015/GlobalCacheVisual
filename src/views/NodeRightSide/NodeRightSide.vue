@@ -19,16 +19,24 @@
             <template #default="props">
                 <div class="cell-com">
                     <div class="dot-box">
-                        <div :class=" this.nodeList.nodeState[ props.row[item.key].nodeIdNum ] === 'NODE_STATE_RUNNING'?'dot-normal':'dot-abnormal'"></div>
+                        <div
+                          :class="this.nodeList.nodeIsc[ props.row[item.key].nodeIdNum ] === true?'dot-normal':'dot-abnormal'"
+                        ></div>
                     </div>
                     <div class="dot-text">
+                      <div v-if="this.nodeList.nodeIsOnline[ props.row[item.key].nodeIdNum ] === true">
                         {{ props.row[item.key].nodeId }}
                         <br />
                         <!-- 3-27 不乘以100 -->
                         {{ this.nodeList.nodeValue[ props.row[item.key].nodeIdNum ] }}%
+                      </div>
+                      <div v-if="this.nodeList.nodeIsOnline[ props.row[item.key].nodeIdNum ] === false">
+                        {{ props.row[item.key].nodeId }}
+                        <br />
+                        Node离线
+                      </div>
                     </div>
                 </div>
-                    
             </template>
           </el-table-column>
         </el-table>
@@ -42,13 +50,22 @@
           <Net ref="net" v-if="nodeNet" :key="nowF"></Net>
           <Ptpg ref="ptpg" v-if="nodePtpg" :key="nowF"></Ptpg>
           <Health ref="health" v-if="nodeHealth" :key="nowF"></Health>
+          <div
+            v-if="this.store.state.nodeIsOnline === false"
+            style="border-radius: 10px;"
+            class="offline"
+          >
+            <span style="font-weight: bold;">
+              {{ this.nowNodeName }}处于离线状态
+            </span>
+          </div>
       </div>
     </div>
   </template>
   
   <script>
   import { useStore } from 'vuex'
-  import { defineAsyncComponent } from "vue"
+  import { defineAsyncComponent,nextTick } from "vue"
   import { IP,WEBSOCKET_PORT } from '@/api/port.js'
   import { ElMessage,ElMessageBox } from 'element-plus'
   export default {
@@ -103,10 +120,14 @@
         nodeList: {
           nodeId: null,// 表格信息
           nodeValue: null, // 颜色信息
-          nodeHealth: null // 健康状态信息
+          nodeIsIn: null,
+          nodeIsRunning: null,
+          nodeIsOnline: null,
+          nodeIsc: null
         },
         // 当前被标记的节点
         nowNode: null,
+        nowNodeName: null,
         // 底部左侧数据 
         bottomLeft: null,
         // 底部右侧数据
@@ -123,7 +144,9 @@
       // 更新vuex中newNodeType
       this.store.commit('changeNodeType', null)
       // 更新vuex中newNodeHealth
-      this.store.commit('changeNodeHealth', null)
+      this.store.commit('changeNodeIsIn',null)
+      this.store.commit('changeNodeIsRunning',null)
+      this.store.commit('changeNodeIsOnline',null)
       // 开启长连接
       this.initNodeList()
     },
@@ -149,28 +172,17 @@
       if(this.nodeNet === true) this.$refs.net.destroynetWS();
     },
     unmounted () {
-      // if(this.wsNodeList.readyState === WebSocket.OPEN){
-        // 销毁长连接
-        if(this.wsNodeList) this.wsNodeList.close(1000,"wsNodeList主动断开连接")
-      // }
-      
-  
-      // 销毁所有Node信息
-      // // 显示左侧视图
-      // this.store.commit('changeView', null)
-      // // 更新vuex中newNodeId
-      // this.store.commit('changeNodeId', "")
-      // // 更新vuex中newNodeType
-      // this.store.commit('changeNodeType', "")
-      // // 更新vuex中newNodeHealth
-      // this.store.commit('changeNodeHealth', null)
+      if(this.wsNodeList) this.wsNodeList.close(1000,"wsNodeList主动断开连接")
     },
     methods: {
       // 
       getNodeList(ret) {
           let tp = []
           let tp_col = []
-          let tp_sta = []
+          let tp_isIn = []
+          let tp_isRunning = []
+          let tp_isOnline = []
+          let tp_isc = []
           let DiskLen = Math.ceil(ret.length / 10) * 10
           for(let i = 0,row_id = 0;i<DiskLen;i += 10,row_id += 1) {
               // 10行一对象
@@ -179,12 +191,19 @@
                   tp_item['id'] = row_id
                   if(j<ret.length){
                       tp_item[ this.columns[j-i]["key"] ] = {
-                          nodeId: "node" + ret[j]['nodeId'].toString(), // 记录nodeId
+                          nodeId: "Node" + ret[j]['nodeId'].toString(), // 记录nodeId
                           isSelect: false, // 记录是否使用过了
                           nodeIdNum: ret[j]['nodeId'] // nodeId的num形式，用于定位
                       }
-                      tp_col[j] = ret[j]['nodeValue'].toFixed(2) // 有颜色，保留两位小数
-                      tp_sta[j] = ret[j]['nodeState'] // 健康状态
+                      tp_col[j] = (ret[j]['isOnline'] === true ? ret[j]['nodeValue'].toFixed(2) : 1000) // 有颜色，保留两位小数,1000是挂掉的状态
+                      tp_isIn[j] = ret[j]['isIn']
+                      tp_isRunning[j] = ret[j]['isRunning']
+                      tp_isOnline[j] = ret[j]['isOnline']
+                      tp_isc[j] = true
+                      if(tp_isOnline[j] === false || tp_isRunning[j] != 'NODE_STATE_RUNNING' || tp_isIn[j] != 'NODE_STATE_IN') 
+                      {
+                        tp_isc[j] = false
+                      }
                   }else{
                       tp_item[ this.columns[j-i]["key"] ] = {
                           nodeId: "null",
@@ -192,7 +211,10 @@
                           nodeIdNum: -1 // nodeId的num形式，用于定位
                       }
                       tp_col[j] = -1 // 非法
-                      tp_sta[j] = 'invalid'// 非法状态
+                      tp_isIn[j] = 'invalid'// 非法状态
+                      tp_isRunning[j] = 'invalid'
+                      tp_isOnline[j] = false
+                      tp_isc[j] = false
                   }
               }
               tp.push(tp_item)
@@ -206,13 +228,22 @@
           // 更新频率
           this.nodeList.nodeValue = tp_col
           // 更新状态
-          this.nodeList.nodeState = tp_sta
+          this.nodeList.nodeIsIn = tp_isIn
+          this.nodeList.nodeIsRunning = tp_isRunning
+          this.nodeList.nodeIsOnline = tp_isOnline
+          this.nodeList.nodeIsc = tp_isc
           // 解除转圈圈
           if(this.loading === true)
           {
             this.loading = false // 第一次就变为false
             this.clickNode({id:0}, {no:0}) // 点击0点
-          } 
+          }
+          // 如果当前节点状态 和 之前节点状态不一致，要重新点击
+          if(this.nodeList.nodeIsOnline[this.nowNode] != this.store.state.nodeIsOnline) {
+            let lr = Math.floor(this.nowNode / 10)
+            let lc = this.nowNode % 10
+            this.clickNode({id:lr}, {no:lc})
+          }
       },
       
       // 点击单元格事件，改为pink粉色，表示选中
@@ -220,16 +251,16 @@
           let id = row.id * 10 + column.no
           // 判断id范围越界
           if(id < 0 || id >= this.nodeList.nodeValue.length) {
-              return ;
+            return ;
           }
           // 判断非法id, 状态是-1，不进行任何操作
           if(this.nodeList.nodeValue[id] === -1) {
-              return ;
+            return ;
           }
           // 重复点击
-          if(id === this.nowNode) {
-              // console.log('重复点击')
-              return ;
+          if(id === this.nowNode && this.store.state.nodeIsOnline === this.nodeList.nodeIsOnline[id]) {
+            // console.log('重复点击')
+            return ;
           }
   
           let lastNode = this.nowNode // 上一个节点
@@ -239,17 +270,32 @@
           this.nowNode = id
           // 变为选中节点
           this.nodeList.nodeId[row.id][colName].isSelect = true
-          // 更新vuex中newNodeId,显示Node左侧栏
-          this.store.commit('changeNodeId', idNum)
-          // 更新vuex中newNodeType
-          if(this.store.state.nowNodeType == null) {
-              this.store.commit('changeNodeType', 'cpu')
+          // 改变当前节点名称
+          this.nowNodeName = this.nodeList.nodeId[row.id][colName].nodeId
+          if(this.nodeList.nodeIsOnline[id] === false)
+          {
+            // 更新vuex中newNodeId,显示Node左侧栏
+            this.store.commit('changeNodeId', idNum)
+            this.store.commit('changeNodeType', null)
+            this.store.commit('changeNodeIsIn',this.nodeList.nodeIsIn[id])
+            this.store.commit('changeNodeIsRunning',this.nodeList.nodeIsRunning[id])
+            this.store.commit('changeNodeIsOnline',this.nodeList.nodeIsOnline[id])
           }
-          // 更新vuex中newNodeHealth
-          this.store.commit('changeNodeHealth', this.nodeList.nodeState[id])
-          // 更新vuex中nowHealthState
-          this.store.commit('changeHealthState', this.nodeList.nodeValue[id])
-  
+          else
+          {
+            // 更新vuex中newNodeId,显示Node左侧栏
+            this.store.commit('changeNodeId', idNum)
+            // 更新vuex中newNodeType
+            if(this.store.state.nowNodeType == null) {
+                this.store.commit('changeNodeType', 'cpu')
+            }
+            // 更新vuex中newNodeHealth
+            this.store.commit('changeNodeIsIn',this.nodeList.nodeIsIn[id])
+            this.store.commit('changeNodeIsRunning',this.nodeList.nodeIsRunning[id])
+            this.store.commit('changeNodeIsOnline',this.nodeList.nodeIsOnline[id])
+            // 更新vuex中nowHealthState
+            this.store.commit('changeHealthState', this.nodeList.nodeValue[id])  
+          }
           // 还原原来节点
           if(lastNode != null) {
               let lastRow = Math.floor(lastNode / 10)
@@ -263,8 +309,10 @@
           let id = rowIndex * 10 + columnIndex // 编号
           let colName = "column" + columnIndex.toString()
           let colVal = this.nodeList.nodeValue[id] // 频率
-          let stateVal = this.nodeList.nodeState[id] // 健康状态
-          // console.log('当前行 = ',this.nodeList.nodeId[rowIndex][colName])
+          let isIn = this.nodeList.nodeIsIn[id]
+          let isRunning = this.nodeList.nodeIsRunning[id]
+          let isOnline = this.nodeList.nodeIsOnline[id]
+          // console.log('当前行 = ',this.nodeList.nodeId[rowIndex][colName].nodeId,isOnline)
           let isNodeSelect = this.nodeList.nodeId[rowIndex][colName].isSelect // 是否被选中
           // 为空，永远不会被选中
           if(colVal === -1){
@@ -285,26 +333,25 @@
             // border-left:1px solid,
             // border-right:1px solid,
           }
-          // 被选中的节点，变为粉色
           if(isNodeSelect === true) {
-              cellDom['background-color'] = 'pink'
+            // 被选中的节点，变为粉色
+            cellDom['background-color'] = 'pink'
           }else{
-            // 正常状态
-            // if(stateVal === 'NODE_STATE_RUNNING') {
-                // 调整颜色区间， > 0.5 是红色异常；<= 0.5 是正常状态 
-                if(0 <= colVal && colVal < 25) {
-                    cellDom['background-color'] = '#B4CDEF'
-                }else if(25 <= colVal && colVal < 50) {
-                    cellDom['background-color'] = '#98BAFE'
-                }else if(50 <= colVal && colVal < 75) {
-                    cellDom['background-color'] = '#5F94FD'
-                }else if(75 <= colVal && colVal < 100) {
-                    cellDom['background-color'] = '#023EB6'
-                }
-            // }else{
-            //     // 异常状态，红色
-            //     cellDom['background-color'] = 'red'
-            // }
+            if(this.nodeList.nodeIsOnline[id] === false) {
+              // 节点离线，变为灰色
+              cellDom['background-color'] = 'gray'
+            }else{
+              // 正常状态
+              if(0 <= colVal && colVal < 25) {
+                  cellDom['background-color'] = '#B4CDEF'
+              }else if(25 <= colVal && colVal < 50) {
+                  cellDom['background-color'] = '#98BAFE'
+              }else if(50 <= colVal && colVal < 75) {
+                  cellDom['background-color'] = '#5F94FD'
+              }else if(75 <= colVal && colVal < 100) {
+                  cellDom['background-color'] = '#023EB6'
+              }
+            }
           }
           
           return cellDom
@@ -364,37 +411,37 @@
     computed: {
       // bottom中是否显示cpu组件
       nodeCpu(){
-          if(this.store.state.nowNodeType === 'cpu') {
+          if(this.store.state.nowNodeType === 'cpu' && this.store.state.nodeIsOnline === true) {
               return true
           }
           return false
       },
       nodeDisk(){
-          if(this.store.state.nowNodeType === 'disk') {
+          if(this.store.state.nowNodeType === 'disk' && this.store.state.nodeIsOnline === true) {
               return true
           }
           return false
       },
       nodeMemory(){
-          if(this.store.state.nowNodeType === 'memory') {
+          if(this.store.state.nowNodeType === 'memory' && this.store.state.nodeIsOnline === true) {
               return true
           }
           return false
       },
       nodeNet(){
-          if(this.store.state.nowNodeType === 'net') {
+          if(this.store.state.nowNodeType === 'net' && this.store.state.nodeIsOnline === true) {
               return true
           }
           return false
       },
       nodePtpg(){
-          if(this.store.state.nowNodeType === 'ptpg') {
+          if(this.store.state.nowNodeType === 'ptpg' && this.store.state.nodeIsOnline === true) {
               return true
           }
           return false
       },
       nodeHealth(){
-          if(this.store.state.nowNodeType === 'health') {
+          if(this.store.state.nowNodeType === 'health' && this.store.state.nodeIsOnline === true) {
               return true
           }
           return false
@@ -493,6 +540,18 @@
   .cell-com {
     display: flex;
     align-items: center;
+  }
+
+  .offline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font:25px arial,sans-serif;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #e1e3e7;
+    background-color: gray;
+    color: black;
   }
   </style>
   
